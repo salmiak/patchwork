@@ -10,6 +10,7 @@
 import _ from 'lodash'
 export default {
   name: 'my-board',
+  props: ['tile'],
   data () {
     return {
       board: [[0]],
@@ -17,12 +18,15 @@ export default {
       boardSize: 9,
       hit: false,
       storeCount: 0,
-      tile: {},
       cursor: {}
     }
   },
+  watch: {
+    tile () {
+      this.mouseOver()
+    }
+  },
   created () {
-    this.newTile()
     let randBoard = []
     for (var y=0; y < this.boardSize; y++) {
       let row = []
@@ -73,7 +77,7 @@ export default {
         })
         this.storeCount++
         this.resetAllCells()
-        this.newTile()
+        this.$emit('tilestored')
       }
     },
     rotateTile () {
@@ -95,30 +99,6 @@ export default {
       this.cells.forEach(cell => {
         this.$set(cell, "hovered", 0)
       })
-    },
-    newTile () {
-      var rand = Math.floor(Math.random()*3)
-      switch(rand) {
-        case 0:
-          this.tile = {
-            pattern: [[0,0,1],[1,1,1],[1,0,1]],
-            offset: {x: 1, y: 1}
-          }
-          break
-        case 1:
-          this.tile = {
-            pattern: [[0,1,0],[1,1,0],[0,1,0],[0,1,1]],
-            offset: {x: 1, y: 2}
-          }
-          break
-        case 2:
-          this.tile = {
-            pattern: [[0,1],[1,1]],
-            offset: {x: 1, y: 1}
-          }
-          break
-      }
-      this.mouseOver()
     }
   }
 }
