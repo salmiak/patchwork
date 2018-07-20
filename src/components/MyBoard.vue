@@ -1,17 +1,13 @@
 <template>
-  <div id="myBoard" :class="{hit: hit}">
-    <div v-for="(row,index) in board" v-bind:key="`row-${index}`">
-      <span v-for="(cell,index) in row" v-bind:key="`cell-${index}`" :class="{filled:cell.value, hovered:cell.hovered}" @mouseover="mouseOver(cell)" @click="storeTile">&nbsp;</span>
-    </div>
-    <div>
-      {{storeCount}}
+  <div id="myBoard" :class="{hit: hit}" @mouseout="resetAllCells()">
+    <div v-for="(row,index) in board" v-bind:key="`row-${index}`" class="row">
+      <div v-for="(cell,index) in row" v-bind:key="`cell-${index}`" :class="{filled:cell.value, hovered:cell.hovered}" class="cell"  @mouseover="mouseOver(cell)" @click="storeTile" @contextmenu.prevent="rotateTile($event)">&nbsp;</div>
     </div>
   </div>
 </template>
 
 <script>
-/* eslint-disable */
-import lodash from 'lodash'
+import _ from 'lodash'
 export default {
   name: 'my-board',
   data () {
@@ -21,19 +17,12 @@ export default {
       boardSize: 9,
       hit: false,
       storeCount: 0,
-      tile: {
-        pattern: [[0,0,1],[1,1,1],[1,0,1]],
-        offset: {x: 1, y: 1}
-      }
-      /*
-      tile: {
-        pattern: [[0,1,0],[1,1,0],[0,1,0],[0,1,1]],
-        offset: {x: 1, y: 2}
-      }
-      */
+      tile: {},
+      cursor: {}
     }
   },
   created () {
+    this.newTile()
     let randBoard = []
     for (var y=0; y < this.boardSize; y++) {
       let row = []
@@ -56,17 +45,19 @@ export default {
       return _.find(this.cells, {x:x, y:y})
     },
     mouseOver (cell) {
-      this.resetAllCells()
-
-      var cursor = {
+      cell = cell || this.cursor
+      this.cursor = {
         x: Math.min(Math.max(cell.x, this.tile.offset.x), this.boardSize - (this.tile.pattern[0].length - this.tile.offset.x)),
         y: Math.min(Math.max(cell.y, this.tile.offset.y), this.boardSize - (this.tile.pattern.length - this.tile.offset.y))
       }
-
+      this.highlightCells()
+    },
+    highlightCells () {
+      this.resetAllCells()
       this.tile.pattern.forEach((row,dy) => {
         row.forEach((tileCell,dx) => {
           if(tileCell) {
-            var curCell = this.getCellAt(cursor.x + dx - this.tile.offset.x, cursor.y + dy - this.tile.offset.y)
+            var curCell = this.getCellAt(this.cursor.x + dx - this.tile.offset.x, this.cursor.y + dy - this.tile.offset.y)
             if (curCell) {
               this.$set(curCell, "hovered", 1)
               this.hit = this.hit || curCell.value
@@ -81,13 +72,53 @@ export default {
           cell.value = cell.hovered || cell.value
         })
         this.storeCount++
+        this.resetAllCells()
+        this.newTile()
       }
+    },
+    rotateTile () {
+      var newPattern = []
+      for (var i = 0; i < this.tile.pattern[0].length; i++) {
+        newPattern.push(new Array(this.tile.pattern.length))
+      }
+      this.tile.pattern.forEach((row,y) => {
+        row.forEach((cell,x) => {
+          newPattern[newPattern.length-x-1][y] = cell
+        })
+      })
+      this.$set(this.tile, "pattern", newPattern)
+      this.mouseOver()
+      return false
     },
     resetAllCells () {
       this.hit = false
       this.cells.forEach(cell => {
         this.$set(cell, "hovered", 0)
       })
+    },
+    newTile () {
+      var rand = Math.floor(Math.random()*3)
+      switch(rand) {
+        case 0:
+          this.tile = {
+            pattern: [[0,0,1],[1,1,1],[1,0,1]],
+            offset: {x: 1, y: 1}
+          }
+          break
+        case 1:
+          this.tile = {
+            pattern: [[0,1,0],[1,1,0],[0,1,0],[0,1,1]],
+            offset: {x: 1, y: 2}
+          }
+          break
+        case 2:
+          this.tile = {
+            pattern: [[0,1],[1,1]],
+            offset: {x: 1, y: 1}
+          }
+          break
+      }
+      this.mouseOver()
     }
   }
 }
@@ -95,34 +126,44 @@ export default {
 
 <style lang="less">
 @cells: 9;
-@size: 64px;
-@fontSize: 12px;
+@size: 20px;
+@fontSize: 1px;
 #myBoard {
   width: @cells * @size;
   height: @cells * @size;
   border: 1px solid #DDD;
   box-sizing: content-box;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: stretch;
+  align-content: stretch;
   &.hit {
     border-color: red;
   }
-}
-#myBoard > div > span {
-  display: inline-block;
-  width: @size;
-  height: @size;
-  font-size: @fontSize;
-  line-height: @fontSize*1.6;
-  padding: (@size - @fontSize*1.6*2)/2;
-  border: 1px solid #DDD;
-  box-sizing: border-box;
-  background: #FFF;
-  &.hovered {
-    background: #CCC;
+  .row {
+    width: 100%;
+    height: @size;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: stretch;
+    align-content: stretch;
   }
-  &.filled {
-    background: #FDD;
+  .cell {
+    display: block;
+    width: @size;
+    height: @size;
+    border: 1px solid #DDD;
+    background: #FFF;
     &.hovered {
-      background: #CAA;
+      background: #CCC;
+    }
+    &.filled {
+      background: #FDD;
+      &.hovered {
+        background: #CAA;
+      }
     }
   }
 }
