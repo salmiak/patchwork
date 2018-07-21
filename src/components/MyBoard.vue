@@ -27,7 +27,7 @@ export default {
     }
   },
   created () {
-    let randBoard = []
+    let board = []
     for (var y=0; y < this.boardSize; y++) {
       let row = []
       for (var x=0; x < this.boardSize; x++) {
@@ -35,14 +35,14 @@ export default {
           id: ''+x+y,
           x: x,
           y: y,
-          value: Math.random() > 0.8
+          value: 0
         }
         row.push(cell)
         this.cells.push(cell)
       }
-      randBoard.push(row)
+      board.push(row)
     }
-    this.board = randBoard
+    this.board = board
   },
   methods: {
     getCellAt (x,y) {
@@ -78,7 +78,7 @@ export default {
       if (!this.tile) {
         return false
       }
-      
+
       if (!this.hit) {
         this.cells.forEach(cell => {
           cell.value = cell.hovered || cell.value
