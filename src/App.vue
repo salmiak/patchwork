@@ -1,20 +1,23 @@
 <template>
   <div id="app">
-    <my-board :tile="tile" @tilestored="removeTileFromArray" />
+    <quilt-board :tile="tile" @tilestored="removeTileFromArray" />
+    <play-board />
     <tile-list :tile-id-array="tileIdArray" @tileselected="tileSelected" />
   </div>
 </template>
 
 <script>
 import _ from 'lodash'
-import MyBoard from './components/MyBoard.vue'
+import QuiltBoard from './components/QuiltBoard.vue'
+import PlayBoard from './components/PlayBoard.vue'
 import TileList from './components/TileList.vue'
 import tiles from './assets/tiles.json'
 
 export default {
   name: 'app',
   components: {
-    MyBoard,
+    QuiltBoard,
+    PlayBoard,
     TileList
   },
   data () {

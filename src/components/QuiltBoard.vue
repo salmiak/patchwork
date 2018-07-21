@@ -9,7 +9,7 @@
 <script>
 import _ from 'lodash'
 export default {
-  name: 'my-board',
+  name: 'QuiltBoard',
   props: ['tile'],
   data () {
     return {
@@ -120,8 +120,8 @@ export default {
 @import '../assets/base.less';
 @fontSize: 1px;
 .board {
-  width: @cells * @size;
-  height: @cells * @size;
+  width: @quiltBoardCells * @size;
+  height: @quiltBoardCells * @size;
   border: 1px solid #DDD;
   box-sizing: content-box;
   display: flex;
