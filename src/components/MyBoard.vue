@@ -1,5 +1,5 @@
 <template>
-  <div id="myBoard" :class="{hit: hit}" @mouseout="resetAllCells()">
+  <div :class="{hit: hit}" class="board" @mouseout="resetAllCells()">
     <div v-for="(row,index) in board" v-bind:key="`row-${index}`" class="row">
       <div v-for="(cell,index) in row" v-bind:key="`cell-${index}`" :class="{filled:cell.value, hovered:cell.hovered}" class="cell"  @mouseover="mouseOver(cell)" @click="storeTile" @contextmenu.prevent="rotateTile($event)">&nbsp;</div>
     </div>
@@ -49,6 +49,10 @@ export default {
       return _.find(this.cells, {x:x, y:y})
     },
     mouseOver (cell) {
+      if (!this.tile) {
+        return false
+      }
+
       cell = cell || this.cursor
       this.cursor = {
         x: Math.min(Math.max(cell.x, this.tile.offset.x), this.boardSize - (this.tile.pattern[0].length - this.tile.offset.x)),
@@ -71,16 +75,24 @@ export default {
       })
     },
     storeTile () {
+      if (!this.tile) {
+        return false
+      }
+      
       if (!this.hit) {
         this.cells.forEach(cell => {
           cell.value = cell.hovered || cell.value
         })
         this.storeCount++
         this.resetAllCells()
-        this.$emit('tilestored')
+        this.$emit('tilestored', this.tile)
       }
     },
     rotateTile () {
+      if (!this.tile) {
+        return false
+      }
+
       var newPattern = []
       for (var i = 0; i < this.tile.pattern[0].length; i++) {
         newPattern.push(new Array(this.tile.pattern.length))
@@ -104,11 +116,10 @@ export default {
 }
 </script>
 
-<style lang="less">
-@cells: 9;
-@size: 20px;
+<style lang="less" scoped>
+@import '../assets/base.less';
 @fontSize: 1px;
-#myBoard {
+.board {
   width: @cells * @size;
   height: @cells * @size;
   border: 1px solid #DDD;

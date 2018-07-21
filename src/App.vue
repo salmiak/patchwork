@@ -1,48 +1,41 @@
 <template>
   <div id="app">
-    <MyBoard :tile="tile" @tilestored="newTile" />
+    <my-board :tile="tile" @tilestored="removeTileFromArray" />
+    <tile-list :tile-id-array="tileIdArray" @tileselected="tileSelected" />
   </div>
 </template>
 
 <script>
+import _ from 'lodash'
 import MyBoard from './components/MyBoard.vue'
+import TileList from './components/TileList.vue'
+import tiles from './assets/tiles.json'
 
 export default {
   name: 'app',
   components: {
-    MyBoard
+    MyBoard,
+    TileList
   },
   data () {
     return {
-      tile: {}
+      tile: undefined,
+      tileIdArray: _.shuffle(_.range(tiles.length))
     }
   },
-  created () {
-    this.newTile()
-  },
   methods: {
+    tileSelected (tile) {
+      this.tile = tile
+    },
+    removeTileFromArray (tile) {
+      this.tileIdArray = _.without(this.tileIdArray, tile.id)
+      this.tile = undefined
+    },
     newTile () {
-      var rand = Math.floor(Math.random()*3)
-      switch(rand) {
-        case 0:
-          this.tile = {
-            pattern: [[0,0,1],[1,1,1],[1,0,1]],
-            offset: {x: 1, y: 1}
-          }
-          break
-        case 1:
-          this.tile = {
-            pattern: [[0,1,0],[1,1,0],[0,1,0],[0,1,1]],
-            offset: {x: 1, y: 2}
-          }
-          break
-        case 2:
-          this.tile = {
-            pattern: [[0,1],[1,1]],
-            offset: {x: 1, y: 1}
-          }
-          break
-      }
+      var rand = Math.floor(Math.random()*4)
+      var id = (new Date()).getTime()
+      this.tile = _.clone(tiles[rand])
+      this.tile.id = id
     }
   }
 }
