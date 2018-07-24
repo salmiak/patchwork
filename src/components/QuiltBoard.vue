@@ -119,6 +119,8 @@ export default {
 <style lang="less" scoped>
 @import '../assets/base.less';
 @fontSize: 1px;
+@size: @quiltBoardCellsSize;
+
 .board {
   width: @quiltBoardCells * @size;
   height: @quiltBoardCells * @size;

@@ -15,6 +15,7 @@ export default {
 
 <style lang="less" scoped>
 @import '../assets/base.less';
+@size: @quiltBoardCellsSize;
 .tile {
   display: flex;
   flex-wrap: wrap;
