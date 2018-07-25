@@ -62,19 +62,20 @@ export default {
 @import '../assets/base.less';
 @size: @playBoardCellSize;
 @cells: 8;
-@buttonSize: 80%;
+@buttonSize: @playBoardCellSize * 0.8;
 @border: 1px solid #222;
 #playBoard {
   width: @cells * @size;
   height: @cells * @size;
-  background: #FFFFEE;
   position: relative;
   box-sizing: content-box;
+  margin: 20px;
 }
 .section {
   display: flex;
   position: absolute;
   box-sizing: border-box;
+  height: @size;
 
   .cell {
     position: relative;
@@ -82,6 +83,10 @@ export default {
     height: @size;
     background: #FFFF33;
     box-sizing: border-box;
+    border-top: @border;
+    &:first-child {
+      border-left: @border;
+    }
     &.even {
       background: #EEEEDD;
     }
@@ -90,7 +95,17 @@ export default {
     }
     &.big {
       width: @size*2;
-      border-left: @size/2 solid #EEEEDD;
+      &::before {
+        content: '';
+        display: block;
+        width: @size / 2;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        background: #EEEEDD;
+        position: absolute;
+        z-index: 10;
+      }
     }
 
     .patch {
@@ -99,25 +114,25 @@ export default {
       height: @quiltBoardCellsSize;
       background: #985;
       position: absolute;
-      top: (@size - @quiltBoardCellsSize)/2;
-      left: @size/-2;
+      top: (@size - 1 - @quiltBoardCellsSize)/2;
+      left: 0;
       z-index: 100;
-      transform: rotate(5deg);
+      transform: rotate(3deg);
     }
     .button {
       display: block;
       width: @buttonSize;
       height: @buttonSize;
-      border-radius: 100%;
+      border-radius: @buttonSize;
       border: 3px solid blue;
       background: lightblue;
       position: absolute;
-      top: 50% - @buttonSize/2;
+      top: (@size - @buttonSize)/2;
       right: @buttonSize/-2;
       z-index: 100;
       box-sizing: border-box;
       &::before {
-        @holeSize: 3px;
+        @holeSize: 2px;
         content: '';
         display: block;
         width: @holeSize;
@@ -144,9 +159,6 @@ export default {
   &:nth-child(4n+4) {
     transform: rotate(270deg);
   }
-
-  border-top: @border;
-  border-left: @border;
 
   &.section-1 {
     top: @size*3;
@@ -187,13 +199,17 @@ export default {
   &.section-10 {
     bottom: @size*2;
     right: @size*2;
-    border-right: @border;
+    .cell:last-child {
+      border-right: @border;
+    }
   }
   &.section-11 {
     top: @size*4;
     left: @size*2;
-    border-left: none;
-    border-bottom: @border;
+    .cell:first-child {
+      border-left: none;
+      border-bottom: @border;
+    }
   }
   &.section-12 {
     top: @size*3;
@@ -202,11 +218,13 @@ export default {
   &.section-13 {
     top: @size*3;
     left: @size*3;
-    border: @border;
-    border-bottom: none;
+    width: @size*2;
+    height: @size*2;
     .cell {
       width: @size*2;
       height: @size*2;
+      border: @border;
+      border-bottom: none;
     }
   }
 }
