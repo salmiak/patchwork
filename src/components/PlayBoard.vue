@@ -16,13 +16,18 @@
 import _ from 'lodash'
 export default {
   name: "PlayBoard",
-  props: ['player1', 'player2'],
   data () {
     return {
       patches: [20, 26, 32, 44, 50]
     }
   },
   computed: {
+    player1 () {
+      return this.$store.state.players[0].pos
+    },
+    player2 () {
+      return this.$store.state.players[1].pos
+    },
     sections () {
       var map = [5, 7, 7, 5, 5, 4, 5, 4, 3, 3, 3, 1, 1, 1]
       var cellSource = _.clone(this.cells)

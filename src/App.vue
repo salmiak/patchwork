@@ -1,15 +1,17 @@
 <template>
   <div id="app">
     <h2>{{currentPlayer.name}}'s turn ({{currentPlayer.buttonsInPocket}})</h2>
-    <quilt-board :tile="tile" @tilestored="tileStored" />
-    <play-board :player1="players[0].pos" :player2="players[1].pos" />
-    <tile-list :tile-id-array="tileIdArray" :current-player="currentPlayer" @tileselected="tileSelected" />
+    <quilt-board :tile="tile" :player="currentPlayer" @tilestored="tileStored" />
+    <quilt-board-mini :player="otherPlayer" />
+    <play-board />
+    <tile-list @tileselected="tileSelected" />
   </div>
 </template>
 
 <script>
 import _ from 'lodash'
 import QuiltBoard from './components/QuiltBoard.vue'
+import QuiltBoardMini from './components/QuiltBoardMini.vue'
 import PlayBoard from './components/PlayBoard.vue'
 import TileList from './components/TileList.vue'
 import tiles from './assets/tiles.json'
@@ -18,36 +20,21 @@ export default {
   name: 'app',
   components: {
     QuiltBoard,
+    QuiltBoardMini,
     PlayBoard,
     TileList
   },
   data () {
     return {
-      tile: undefined,
-      tileIdArray: _.shuffle(_.range(tiles.length)),
-      players: [
-        {
-          name: 'Green player',
-          pos: 0,
-          buttonsOnBoard: 0,
-          buttonsInPocket: 5
-        },
-        {
-          name: 'Yellow player',
-          pos: 0,
-          buttonsOnBoard: 0,
-          buttonsInPocket: 5
-        }
-      ],
-      playing: 0
+      tile: undefined
     }
   },
   computed: {
     currentPlayer () {
-      return this.players[this.playing]
+      return this.$store.getters.currentPlayer
     },
     otherPlayer () {
-      return this.players[(this.playing+1)%2]
+      return this.$store.getters.currentNotPlayer
     }
   },
   methods: {
@@ -55,15 +42,14 @@ export default {
       this.tile = tile
     },
     tileStored (tile) {
-      this.currentPlayer.pos += tile.time
-      this.currentPlayer.buttonsInPocket -= tile.cost
+      this.$store.commit('increasePlayerProgress', tile.time)
+      this.$store.commit('balancePlayersPocket', -1 * tile.cost)
+      // this.currentPlayer.pos += tile.time
+      // this.currentPlayer.buttonsInPocket -= tile.cost
       if (this.currentPlayer.pos > this.otherPlayer.pos) {
-        this.playing = (this.playing+1)%2
+        this.$store.commit('nextPlayer')
       }
-      this.removeTileFromArray(tile)
-    },
-    removeTileFromArray (tile) {
-      this.tileIdArray = _.without(this.tileIdArray, tile.id)
+      this.$store.commit('removeTileFromArray', tile)
       this.tile = undefined
     },
     newTile () {

@@ -1,35 +1,29 @@
 <template lang="html">
   <ul class="tileList">
-    <li v-for="tile in tileArray.splice(0,3)" :key="tile.id">
+    <li v-for="(tile, i) in tileArray" :key="tile.id">
       <div class="tileInfo">
         <i class="fal fa-hourglass-half" /> {{tile.time}} | <i class="fal fa-bullseye" /> {{tile.cost}}
       </div>
-      <tile v-if="currentPlayer.buttonsInPocket >= tile.cost" :tile-data="tile" @click.native="selectTile(tile)" />
-      <tile v-else :tile-data="tile" />
-    </li>
-    <li v-for="tile in tileArray" :key="tile.id">
-      <div class="tileInfo">
-        <i class="fal fa-hourglass-half" /> {{tile.time}} | <i class="fal fa-bullseye" /> {{tile.cost}}
-      </div>
-      <tile :tile-data="tile" class="not-selectable" />
+      <tile v-if="currentPlayer.buttonsInPocket >= tile.cost && i < 3" :tile-data="tile" @click.native="selectTile(tile)" />
+      <tile v-else :tile-data="tile" class="not-selectable" />
     </li>
   </ul>
 </template>
 
 <script>
-import _ from 'lodash'
 import Tile from './Tile.vue'
-import tiles from '../assets/tiles.json'
 
 export default {
   name: "TileList",
   components: {
     Tile
   },
-  props: ['tileIdArray','currentPlayer'],
   computed: {
+    currentPlayer () {
+      return this.$store.getters['currentPlayer']
+    },
     tileArray () {
-      return _.map(this.tileIdArray, i => { return tiles[i] })
+      return this.$store.getters['tileArray']
     }
   },
   methods: {
