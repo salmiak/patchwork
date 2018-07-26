@@ -1,10 +1,11 @@
 <template lang="html">
   <div id="playBoard">
-    <div v-for="(length, index) in sections" :key="`sec-${index}`" :class="[`section-${index}`]" class="section">
-      <div v-for="cell in cells.splice(0,length)" :key="cell.index" :class="[`cell-${cell.index}`, {even: cell.index % 2, tripple: cell.size === 3, big: cell.patch, button: cell.button}]" class="cell">
-        &nbsp;
+    <div v-for="(secCells, index) in sections" :key="`sec-${index}`" :class="[`section-${index}`]" class="section">
+      <div v-for="cell in secCells" :key="cell.index" :class="[`cell-${cell.index}`, {even: cell.index % 2, tripple: cell.size === 3, big: cell.patch, button: cell.button}]" class="cell">
         <div v-if="cell.button" class="button" />
         <div v-if="cell.patch && patch(cell.index)" class="patch" />
+        <div v-if="cell.index === player1" class="player player1" />
+        <div v-if="cell.index === player2" class="player player2" />
       </div>
     </div>
   </div>
@@ -15,6 +16,7 @@
 import _ from 'lodash'
 export default {
   name: "PlayBoard",
+  props: ['player1', 'player2'],
   data () {
     return {
       patches: [20, 26, 32, 44, 50]
@@ -22,7 +24,11 @@ export default {
   },
   computed: {
     sections () {
-      return [5, 7, 7, 5, 5, 4, 5, 4, 3, 3, 3, 1, 1, 1]
+      var map = [5, 7, 7, 5, 5, 4, 5, 4, 3, 3, 3, 1, 1, 1]
+      var cellSource = _.clone(this.cells)
+      return _.map(map, length => {
+        return cellSource.splice(0, length)
+      })
     },
     cells () {
       var cells = _.map(_.range(64), i => {
@@ -64,6 +70,8 @@ export default {
 @cells: 8;
 @buttonSize: @playBoardCellSize * 0.8;
 @border: 1px solid #222;
+@color1: lightgreen;
+@color2: pink;
 #playBoard {
   width: @cells * @size;
   height: @cells * @size;
@@ -81,14 +89,14 @@ export default {
     position: relative;
     width: @size;
     height: @size;
-    background: #FFFF33;
+    background: @color1;
     box-sizing: border-box;
     border-top: @border;
     &:first-child {
       border-left: @border;
     }
     &.even {
-      background: #EEEEDD;
+      background: @color2;
     }
     &.tripple {
       width: @size*3;
@@ -102,12 +110,30 @@ export default {
         top: 0;
         left: 0;
         bottom: 0;
-        background: #EEEEDD;
+        background: @color2;
         position: absolute;
         z-index: 10;
       }
     }
 
+    .player {
+      @playerSize: @size * 0.75;
+      position: relative;
+      display: inline-block;
+      z-index: 400;
+      border-radius: @playerSize;
+      width: @playerSize;
+      height: @playerSize;
+      margin: (@size - 1 - @playerSize) * 0.4 @playerSize * -0.2 0 0;
+      &1 {
+        background: green;
+        box-shadow: 3px 3px 0 0 lighten(green, 10%);
+      }
+      &2 {
+        background: yellow;
+        box-shadow: 3px 3px 0 0 darken(yellow, 10%);
+      }
+    }
     .patch {
       display: block;
       width: @quiltBoardCellsSize;

@@ -4,7 +4,8 @@
       <div class="tileInfo">
         <i class="fal fa-hourglass-half" /> {{tile.time}} | <i class="fal fa-bullseye" /> {{tile.cost}}
       </div>
-      <tile :tile-data="tile" @click.native="selectTile(tile)" />
+      <tile v-if="currentPlayer.buttonsInPocket >= tile.cost" :tile-data="tile" @click.native="selectTile(tile)" />
+      <tile v-else :tile-data="tile" />
     </li>
     <li v-for="tile in tileArray" :key="tile.id">
       <div class="tileInfo">
@@ -25,7 +26,7 @@ export default {
   components: {
     Tile
   },
-  props: ['tileIdArray'],
+  props: ['tileIdArray','currentPlayer'],
   computed: {
     tileArray () {
       return _.map(this.tileIdArray, i => { return tiles[i] })

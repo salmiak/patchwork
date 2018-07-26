@@ -1,8 +1,9 @@
 <template>
   <div id="app">
-    <quilt-board :tile="tile" @tilestored="removeTileFromArray" />
-    <play-board />
-    <tile-list :tile-id-array="tileIdArray" @tileselected="tileSelected" />
+    <h2>{{currentPlayer.name}}'s turn ({{currentPlayer.buttonsInPocket}})</h2>
+    <quilt-board :tile="tile" @tilestored="tileStored" />
+    <play-board :player1="players[0].pos" :player2="players[1].pos" />
+    <tile-list :tile-id-array="tileIdArray" :current-player="currentPlayer" @tileselected="tileSelected" />
   </div>
 </template>
 
@@ -23,12 +24,43 @@ export default {
   data () {
     return {
       tile: undefined,
-      tileIdArray: _.shuffle(_.range(tiles.length))
+      tileIdArray: _.shuffle(_.range(tiles.length)),
+      players: [
+        {
+          name: 'Green player',
+          pos: 0,
+          buttonsOnBoard: 0,
+          buttonsInPocket: 5
+        },
+        {
+          name: 'Yellow player',
+          pos: 0,
+          buttonsOnBoard: 0,
+          buttonsInPocket: 5
+        }
+      ],
+      playing: 0
+    }
+  },
+  computed: {
+    currentPlayer () {
+      return this.players[this.playing]
+    },
+    otherPlayer () {
+      return this.players[(this.playing+1)%2]
     }
   },
   methods: {
     tileSelected (tile) {
       this.tile = tile
+    },
+    tileStored (tile) {
+      this.currentPlayer.pos += tile.time
+      this.currentPlayer.buttonsInPocket -= tile.cost
+      if (this.currentPlayer.pos > this.otherPlayer.pos) {
+        this.playing = (this.playing+1)%2
+      }
+      this.removeTileFromArray(tile)
     },
     removeTileFromArray (tile) {
       this.tileIdArray = _.without(this.tileIdArray, tile.id)

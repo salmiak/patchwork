@@ -21,11 +21,6 @@ export default {
       cursor: {}
     }
   },
-  watch: {
-    tile () {
-      this.mouseOver()
-    }
-  },
   created () {
     let board = []
     for (var y=0; y < this.boardSize; y++) {
