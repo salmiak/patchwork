@@ -4,6 +4,7 @@
     <quilt-board :tile="tile" :player="currentPlayer" @tilestored="tileStored" />
     <quilt-board-mini :player="otherPlayer" />
     <play-board />
+    <button @click="goForward">Go forward</button>
     <tile-list @tileselected="tileSelected" />
   </div>
 </template>
@@ -57,6 +58,12 @@ export default {
       var id = (new Date()).getTime()
       this.tile = _.clone(tiles[rand])
       this.tile.id = id
+    },
+    goForward () {
+      var diff = 1 + this.$store.getters.currentNotPlayer.pos - this.$store.getters.currentPlayer.pos
+      this.$store.commit('increasePlayerProgress', diff)
+      this.$store.commit('balancePlayersPocket', diff)
+      this.$store.commit('nextPlayer')
     }
   }
 }

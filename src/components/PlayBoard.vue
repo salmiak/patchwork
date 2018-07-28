@@ -4,8 +4,8 @@
       <div v-for="cell in secCells" :key="cell.index" :class="[`cell-${cell.index}`, {even: cell.index % 2, tripple: cell.size === 3, big: cell.patch, button: cell.button}]" class="cell">
         <div v-if="cell.button" class="button" />
         <div v-if="cell.patch && patch(cell.index)" class="patch" />
-        <div v-if="cell.index === player1" class="player player1" />
-        <div v-if="cell.index === player2" class="player player2" />
+        <div v-if="cell.index === player1" :class="{active: $store.getters.currentPlayer.index === 0}" class="player player1" />
+        <div v-if="cell.index === player2" :class="{active: $store.getters.currentPlayer.index === 1}" class="player player2" />
       </div>
     </div>
   </div>
@@ -130,6 +130,14 @@ export default {
       width: @playerSize;
       height: @playerSize;
       margin: (@size - 1 - @playerSize) * 0.4 @playerSize * -0.2 0 0;
+      &.active {
+        z-index: 500;
+      }
+      &:nth-child(2) {
+        position: absolute;
+        top: (@size - 1 - @playerSize) * 0.4;
+        left: @playerSize * -0.2
+      }
       &1 {
         background: green;
         box-shadow: 3px 3px 0 0 lighten(green, 10%);
