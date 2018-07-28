@@ -1,11 +1,13 @@
 <template lang="html">
   <div id="playBoard">
     <div v-for="(secCells, index) in sections" :key="`sec-${index}`" :class="[`section-${index}`]" class="section">
-      <div v-for="cell in secCells" :key="cell.index" :class="[`cell-${cell.index}`, {even: cell.index % 2, tripple: cell.size === 3, big: cell.patch, button: cell.button}]" class="cell">
+      <div v-for="cell in secCells" :key="cell.index" :class="[`cell-${cell.index}`, {even: cell.index % 2, tripple: cell.size === 3, big: cell.big, button: cell.button}]" class="cell">
+
         <div v-if="cell.button" class="button" />
-        <div v-if="cell.patch && patch(cell.index)" class="patch" />
-        <div v-if="cell.index === player1" :class="{active: $store.getters.currentPlayer.index === 0}" class="player player1" />
-        <div v-if="cell.index === player2" :class="{active: $store.getters.currentPlayer.index === 1}" class="player player2" />
+        <div v-if="cell.patch" class="patch" />
+        <div v-if="cell.index === player1pos" :class="{active: $store.getters.currentPlayer.index === 0}" class="player player1" />
+        <div v-if="cell.index === player2pos" :class="{active: $store.getters.currentPlayer.index === 1}" class="player player2" />
+
       </div>
     </div>
   </div>
@@ -16,17 +18,18 @@
 import _ from 'lodash'
 export default {
   name: "PlayBoard",
-  data () {
-    return {
-      patches: [20, 26, 32, 44, 50]
-    }
-  },
   computed: {
-    player1 () {
+    player1pos () {
       return this.$store.state.players[0].pos
     },
-    player2 () {
+    player2pos () {
       return this.$store.state.players[1].pos
+    },
+    patches () {
+      return this.$store.state.patches
+    },
+    buttons () {
+      return this.$store.state.buttons
     },
     sections () {
       var map = [5, 7, 7, 5, 5, 4, 5, 4, 3, 3, 3, 1, 1, 1]
@@ -40,30 +43,13 @@ export default {
         return {
           index: i,
           size: 1,
-          button: false
+          patch: (this.patches.indexOf(i) !== -1),
+          big: (this.$store.state.patchesPos.indexOf(i) !== -1),
+          button: (this.buttons.indexOf(i) !== -1)
         }
       })
       cells[0].size = 3
-      cells[20].patch = true
-      cells[26].patch = true
-      cells[32].patch = true
-      cells[44].patch = true
-      cells[50].patch = true
-      cells[4].button = true
-      cells[10].button = true
-      cells[16].button = true
-      cells[22].button = true
-      cells[28].button = true
-      cells[34].button = true
-      cells[40].button = true
-      cells[46].button = true
-      cells[52].button = true
       return cells
-    }
-  },
-  methods: {
-    patch (id) {
-      return this.patches.indexOf(id) !== -1
     }
   }
 }

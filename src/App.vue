@@ -4,18 +4,16 @@
     <quilt-board :tile="tile" :player="currentPlayer" @tilestored="tileStored" />
     <quilt-board-mini :player="otherPlayer" />
     <play-board />
-    <button @click="goForward">Go forward</button>
+    <button v-if="!miniTile" @click="goForward">Go forward</button>
     <tile-list @tileselected="tileSelected" />
   </div>
 </template>
 
 <script>
-import _ from 'lodash'
 import QuiltBoard from './components/QuiltBoard.vue'
 import QuiltBoardMini from './components/QuiltBoardMini.vue'
 import PlayBoard from './components/PlayBoard.vue'
 import TileList from './components/TileList.vue'
-import tiles from './assets/tiles.json'
 
 export default {
   name: 'app',
@@ -36,34 +34,53 @@ export default {
     },
     otherPlayer () {
       return this.$store.getters.currentNotPlayer
+    },
+    miniTile () {
+      return this.$store.state.miniTile
+    }
+  },
+  watch: {
+    miniTile (newVal) {
+      if (newVal === true) {
+        this.tile = {
+          'id': null,
+          'pattern': [
+            [1]
+          ],
+          'offset': {
+            'x': 0,
+            'y': 0
+          },
+          'time': 0,
+          'cost': 0,
+          'buttons': 0
+        }
+      }
     }
   },
   methods: {
     tileSelected (tile) {
+      if (this.miniTile) {
+        // eslint-disable-next-line
+        return console.log('you have to play this tile')
+      }
       this.tile = tile
     },
     tileStored (tile) {
-      this.$store.commit('increasePlayerProgress', tile.time)
+      this.$store.commit('resetMiniTile')
       this.$store.commit('balancePlayersPocket', -1 * tile.cost)
-      // this.currentPlayer.pos += tile.time
-      // this.currentPlayer.buttonsInPocket -= tile.cost
-      if (this.currentPlayer.pos > this.otherPlayer.pos) {
-        this.$store.commit('nextPlayer')
-      }
       this.$store.commit('removeTileFromArray', tile)
       this.tile = undefined
-    },
-    newTile () {
-      var rand = Math.floor(Math.random()*4)
-      var id = (new Date()).getTime()
-      this.tile = _.clone(tiles[rand])
-      this.tile.id = id
+      this.$store.commit('increasePlayerProgress', tile.time)
     },
     goForward () {
+      if (this.miniTile) {
+        // eslint-disable-next-line
+        return console.log('you have to play this tile')
+      }
       var diff = 1 + this.$store.getters.currentNotPlayer.pos - this.$store.getters.currentPlayer.pos
-      this.$store.commit('increasePlayerProgress', diff)
       this.$store.commit('balancePlayersPocket', diff)
-      this.$store.commit('nextPlayer')
+      this.$store.commit('increasePlayerProgress', diff)
     }
   }
 }
