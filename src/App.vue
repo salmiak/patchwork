@@ -69,6 +69,7 @@ export default {
     tileStored (tile) {
       this.$store.commit('resetMiniTile')
       this.$store.commit('balancePlayersPocket', -1 * tile.cost)
+      this.$store.commit('increasePlayersBoardButtons', tile.buttons)
       this.$store.commit('removeTileFromArray', tile)
       this.tile = undefined
       this.$store.commit('increasePlayerProgress', tile.time)

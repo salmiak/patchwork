@@ -32,8 +32,8 @@ const store = new Vuex.Store({
     ],
     tileIdArray: _.shuffle(_.range(tiles.length)),
     miniTile: false,
-    patchesPos: [2, 20, 26, 32, 44, 50],
-    patches: [2, 20, 26, 32, 44, 50],
+    patchesPos: [20, 26, 32, 44, 50],
+    patches: [20, 26, 32, 44, 50],
     buttons: [4, 10, 16, 22, 28, 34, 40, 46, 52]
   },
   getters: {
@@ -94,7 +94,13 @@ const store = new Vuex.Store({
       state.miniTile = false
     },
     increasePlayerProgress (state, steps) {
+      var oldPos = state.players[state.currentlyPlaying].pos
       state.players[state.currentlyPlaying].pos += steps
+      state.buttons.forEach(button => {
+        if (oldPos <= button && state.players[state.currentlyPlaying].pos > button) {
+          state.players[state.currentlyPlaying].buttonsInPocket += state.players[state.currentlyPlaying].buttonsOnBoard
+        }
+      })
       if (state.patches[0] <= this.getters.currentPlayer.pos) {
         state.miniTile = true
         state.patches.shift()
@@ -104,6 +110,9 @@ const store = new Vuex.Store({
     },
     balancePlayersPocket (state, amount) {
       state.players[state.currentlyPlaying].buttonsInPocket += amount
+    },
+    increasePlayersBoardButtons (state, amount) {
+      state.players[state.currentlyPlaying].buttonsOnBoard += amount
     },
     nextPlayer (state) {
       state.currentlyPlaying = (state.currentlyPlaying + 1) % 2
