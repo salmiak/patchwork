@@ -30,7 +30,7 @@ const store = new Vuex.Store({
         cells: []
       }
     ],
-    tileIdArray: _.shuffle(_.range(tiles.length)),
+    tileIdArray: _.concat(0, _.shuffle(_.range(1, tiles.length))),
     miniTile: false,
     patchesPos: [20, 26, 32, 44, 50],
     patches: [20, 26, 32, 44, 50],

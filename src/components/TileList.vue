@@ -37,16 +37,22 @@ export default {
 <style lang="less">
 .tileList {
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
+  align-content: stretch;
   overflow-x: auto;
   overflow-y: visible;
   li {
+    padding: 10px;
     display: block;
-    width: 30%;
+    width: 15%;
     flex-grow: 0;
     flex-shrink: 0;
+    background: #CEE;
+    &:nth-child(1), &:nth-child(2), &:nth-child(3) {
+      background: darken(#CEE, 10%);
+    }
     .not-selectable {
-      opacity: 0.3;
+      opacity: 0.6;
     }
     .tileInfo {
       margin-bottom: 6px;
