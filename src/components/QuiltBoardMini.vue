@@ -14,9 +14,6 @@ export default {
     return {
       boardSize: 9,
     }
-  },
-  created () {
-    this.$store.commit('generateBoard', this.player.index)
   }
 }
 </script>

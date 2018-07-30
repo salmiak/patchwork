@@ -6,9 +6,11 @@ import tiles from '../assets/tiles.json'
 Vue.use(Vuex)
 
 const quiltBoardSize = 9
+const maxPos = 53
 
 const store = new Vuex.Store({
   state: {
+    gameOver: false,
     currentlyPlaying: 0,
     players: [
       {
@@ -18,7 +20,9 @@ const store = new Vuex.Store({
         buttonsOnBoard: 0,
         buttonsInPocket: 5,
         board: [[0]],
-        cells: []
+        cells: [],
+        boardPenelty: 0,
+        endScore: 0
       },
       {
         index: 1,
@@ -27,7 +31,9 @@ const store = new Vuex.Store({
         buttonsOnBoard: 0,
         buttonsInPocket: 5,
         board: [[0]],
-        cells: []
+        cells: [],
+        boardPenelty: 0,
+        endScore: 0
       }
     ],
     tileIdArray: _.concat(0, _.shuffle(_.range(1, tiles.length))),
@@ -51,24 +57,25 @@ const store = new Vuex.Store({
     }
   },
   mutations: {
-    generateBoard (state, pnr) {
-      let player = state.players[pnr]
-      let board = []
-      for (var y=0; y < quiltBoardSize; y++) {
-        let row = []
-        for (var x=0; x < quiltBoardSize; x++) {
-          var cell = {
-            id: ''+x+y,
-            x: x,
-            y: y,
-            value: 0
+    generateBoards (state) {
+      state.players.forEach(player => {
+        let board = []
+        for (var y=0; y < quiltBoardSize; y++) {
+          let row = []
+          for (var x=0; x < quiltBoardSize; x++) {
+            var cell = {
+              id: ''+x+y,
+              x: x,
+              y: y,
+              value: 0
+            }
+            row.push(cell)
+            player.cells.push(cell)
           }
-          row.push(cell)
-          player.cells.push(cell)
+          board.push(row)
         }
-        board.push(row)
-      }
-      player.board = board
+        player.board = board
+      })
     },
     hoverCell (state, {cell}) {
       Vue.set(cell, 'hovered', 1)
@@ -88,23 +95,30 @@ const store = new Vuex.Store({
       })
     },
     removeTileFromArray (state, tile) {
-      state.tileIdArray = _.without(state.tileIdArray, tile.id)
+      var toEnd = state.tileIdArray.splice(0, state.tileIdArray.indexOf(tile.id))
+      state.tileIdArray = _.chain(state.tileIdArray).concat(toEnd).without(tile.id).value()
     },
     resetMiniTile (state) {
       state.miniTile = false
     },
     increasePlayerProgress (state, steps) {
-      var oldPos = state.players[state.currentlyPlaying].pos
-      state.players[state.currentlyPlaying].pos += steps
+      var curPlayer = state.players[state.currentlyPlaying]
+      var oldPos = curPlayer.pos
+
+      curPlayer.pos += steps
+      curPlayer.pos = Math.min(curPlayer.pos, maxPos)
+
       state.buttons.forEach(button => {
-        if (oldPos <= button && state.players[state.currentlyPlaying].pos > button) {
-          state.players[state.currentlyPlaying].buttonsInPocket += state.players[state.currentlyPlaying].buttonsOnBoard
+        if (oldPos <= button && curPlayer.pos > button) {
+          curPlayer.buttonsInPocket += curPlayer.buttonsOnBoard
         }
       })
-      if (state.patches[0] <= this.getters.currentPlayer.pos) {
+      if (state.patches[0] <= curPlayer.pos) {
         state.miniTile = true
         state.patches.shift()
-      } else if (this.getters.currentPlayer.pos > this.getters.currentNotPlayer.pos) {
+      } else if (curPlayer.pos + this.getters.currentNotPlayer.pos >= maxPos * 2) {
+        this.commit('gameOver')
+      } else if (curPlayer.pos > this.getters.currentNotPlayer.pos) {
         this.commit('nextPlayer')
       }
     },
@@ -116,6 +130,16 @@ const store = new Vuex.Store({
     },
     nextPlayer (state) {
       state.currentlyPlaying = (state.currentlyPlaying + 1) % 2
+    },
+    gameOver (state) {
+      state.gameOver = true
+      state.players.forEach(player => {
+        var cellsFilled = _.sumBy(player.cells, 'value')
+        player.boardPenelty = (quiltBoardSize * quiltBoardSize - cellsFilled) * 2
+        player.endScore = player.buttonsInPocket - player.boardPenelty
+        // eslint-disable-next-line
+        console.log(player.board)
+      })
     }
   }
 })

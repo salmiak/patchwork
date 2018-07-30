@@ -17,9 +17,6 @@ export default {
       cursor: {}
     }
   },
-  created () {
-    this.$store.commit('generateBoard', this.player.index)
-  },
   methods: {
     getCellAt (x,y) {
       return this.$store.getters.getCellAt({x:x, y:y, pnr: this.player.index})
