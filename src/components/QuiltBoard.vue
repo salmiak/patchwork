@@ -1,7 +1,7 @@
 <template>
   <div :class="{hit: hit}" class="board" @mouseout="resetAllCells()">
     <div v-for="(row,index) in player.board" v-bind:key="`row-${index}`" class="row">
-      <div v-for="(cell,index) in row" v-bind:key="`cell-${index}`" :class="{filled:cell.value, hovered:cell.hovered, button:cell.value === 2}" class="cell"  @mouseover="mouseOver(cell)" @click="storeTile" @contextmenu.prevent="rotateTile($event)">&nbsp;</div>
+      <div v-for="(cell,index) in row" v-bind:key="`cell-${index}`" :class="{filled:cell.value, hovered:cell.hovered, button:cell.value === 2}" class="cell"  @mouseover="mouseOver(cell)" @click="storeTile" @contextmenu.prevent="rotateTile()">&nbsp;</div>
     </div>
   </div>
 </template>
@@ -72,7 +72,6 @@ export default {
       })
       this.$set(this.tile, "pattern", newPattern)
       this.mouseOver()
-      return false
     },
     resetAllCells () {
       this.$store.commit('unhoverAllCells')

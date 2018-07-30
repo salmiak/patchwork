@@ -8,6 +8,7 @@
             <i class="fal fa-bullseye" /> {{currentPlayer.buttonsInPocket}}
           </p>
           <quilt-board :tile="tile" :player="currentPlayer" @tilestored="tileStored" />
+          <button @click="mirrorTile">Mirror Tile</button>
         </div>
 
         <div v-if="otherPlayer.index === player.index" :key="player.index" :class="[`player${player.index}`]" class="boardContainer">
@@ -117,6 +118,17 @@ export default {
     this.$store.commit('generateBoards')
   },
   methods: {
+    mirrorTile () {
+      if (!this.tile) {
+        return false
+      }
+
+      this.tile.pattern.forEach((row) => {
+        var newRow = _.reverse(row)
+        row = newRow
+      })
+      this.mouseOver()
+    },
     tileSelected (tile) {
       if (this.miniTile) {
         // eslint-disable-next-line
