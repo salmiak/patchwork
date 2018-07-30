@@ -1,12 +1,34 @@
 <template>
-  <div id="app">
-    <h2>{{currentPlayer.name}}'s turn ({{currentPlayer.buttonsInPocket}})</h2>
-    <quilt-board :tile="tile" :player="currentPlayer" @tilestored="tileStored" />
-    <quilt-board-mini :player="otherPlayer" />
-    <play-board />
-    <button v-if="!miniTile" @click="goForward">Go forward</button>
+  <div id="app" :class="{isPlayer1: currentPlayer.index === 0, isPlayer2: currentPlayer.index === 1}">
+    <div class="boardsArea">
+      <template v-for="player in $store.state.players">
+        <div v-if="currentPlayer.index === player.index" :key="player.index" :class="[`player${player.index}`]" class="boardContainer isActive">
+          <h2>{{currentPlayer.name}}'s turn</h2>
+          <p>
+            <i class="fal fa-bullseye" /> {{currentPlayer.buttonsInPocket}}
+          </p>
+          <quilt-board :tile="tile" :player="currentPlayer" @tilestored="tileStored" />
+        </div>
+
+        <div v-if="otherPlayer.index === player.index" :key="player.index" :class="[`player${player.index}`]" class="boardContainer">
+          <h3>{{otherPlayer.name}}</h3>
+          <p>
+            <i class="fal fa-bullseye" /> {{otherPlayer.buttonsInPocket}}
+          </p>
+          <quilt-board-mini :player="otherPlayer" />
+        </div>
+      </template>
+
+      <div class="boardContainer">
+        <play-board />
+        <button v-if="!miniTile" @click="goForward">Go forward</button>
+      </div>
+    </div>
+
     <tile-list @tileselected="tileSelected" />
-    <button @click="$store.commit('gameOver')">Debug: End game</button>
+
+    <!-- <button @click="$store.commit('gameOver')">Debug: End game</button> -->
+
     <div v-if="$store.state.gameOver" id="gameOver">
       <h3>Game Over</h3>
       <h1 v-if="winningPlayer">
@@ -132,12 +154,59 @@ export default {
   padding: 0;
   box-sizing: border-box;
 }
+body {
+  background: #566;
+  display: flex;
+  width: 100vw;
+  min-height: 100vh;
+  justify-content: center;
+  align-items: center;
+}
+button {
+  border: none;
+  background: lightgreen;
+  padding: 0 1em;
+  line-height: 2em;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px fade(black, 30%);
+  font-family: inherit;
+  font-size: inherit;
+}
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  width: 95%;
+  min-width: 800px;
+  max-width: 1024px;
+  padding: 1px 0;
+  background: #F5F5F5;
+  border-radius: 6px;
+  box-shadow: 0 4px 32px fade(black, 80%), 0 16px 64px fade(black, 24%);
+  &.isPlayer1 {
+    background: lighten(lightgreen, 10%);
+  }
+  &.isPlayer2 {
+    background: lightyellow;
+  }
+}
+.boardsArea {
+  display: flex;
+  width: 95%;
+  margin: 2.5vh auto;
+  justify-content: space-between;
+  align-items: center;
+  .boardContainer {
+    text-align: center;
+    // outline: 1px solid red;
+    &.player0 { order: 1 }
+    &.player1 { order: 3 }
+    &:nth-child(3) {
+      order: 2;
+    }
+  }
 }
 #gameOver {
   background: fade(#000, 70%);
