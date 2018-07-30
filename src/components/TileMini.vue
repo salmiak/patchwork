@@ -17,17 +17,17 @@ export default {
 
 <style lang="less" scoped>
 @import '../assets/base.less';
-@size: @quiltBoardCellsSize * 0.25;
+@size: @miniCellSize;
 .tileMiniContainer {
   display: inline-flex;
   justify-content: center;
   align-items: center;
   width: @size*7;
   height: @size*7;
+  vertical-align: middle;
   border-radius: 100%;
   background: darken(lightgreen, 10%);
-  vertical-align: baseline;
-  margin: 0 10px;
+  margin: 0 10px 0 0;
 }
 .tile {
   display: flex;

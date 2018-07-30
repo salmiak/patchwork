@@ -8,13 +8,13 @@
             <i class="fal fa-bullseye" /> {{currentPlayer.buttonsInPocket}}
           </p>
           <quilt-board :tile="tile" :player="currentPlayer" />
-          <div v-if="tile">
+          <div v-if="tile" class="quiltBoardToolbar">
             <tile-mini :tile-data="tile" />
             <button @click="mirrorTile">Mirror Tile</button>
             <button @click="rotateTile">Rotate Tile</button>
           </div>
-          <div v-else>
-            Select a tile from the list below, or go forward.
+          <div v-else class="quiltBoardToolbar">
+            Select a tile or go forward.
           </div>
         </div>
 
@@ -129,6 +129,7 @@ export default {
 </script>
 
 <style lang="less">
+@import './assets/base.less';
 * {
   margin: 0;
   padding: 0;
@@ -186,6 +187,16 @@ button {
     &:nth-child(3) {
       order: 2;
     }
+  }
+}
+.quiltBoardToolbar {
+  height: @miniCellSize * 9;
+  line-height: @miniCellSize * 7;
+  border-radius: @miniCellSize * 9;
+  padding: @miniCellSize;
+  background: lighten(lightgreen, 15%);
+  button {
+    margin-right: 10px;
   }
 }
 #gameOver {

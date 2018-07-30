@@ -21,7 +21,7 @@ export default {
 <style lang="less" scoped>
 @import '../assets/base.less';
 @fontSize: 1px;
-@size: @quiltBoardCellsSize*0.25;
+@size: @miniCellSize;
 
 .board {
   margin: 10px auto;
