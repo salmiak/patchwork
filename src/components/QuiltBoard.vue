@@ -51,26 +51,11 @@ export default {
     storeTile () {
       if (this.tile && !this.hit) {
         this.$store.commit('storeTile')
-        this.$store.commit('unhoverAllCells')
         this.hit = false
-        this.$emit('tilestored', this.tile)
       }
     },
     rotateTile () {
-      if (!this.tile) {
-        return false
-      }
-
-      var newPattern = []
-      for (var i = 0; i < this.tile.pattern[0].length; i++) {
-        newPattern.push(new Array(this.tile.pattern.length))
-      }
-      this.tile.pattern.forEach((row,y) => {
-        row.forEach((cell,x) => {
-          newPattern[newPattern.length-x-1][y] = cell
-        })
-      })
-      this.$set(this.tile, "pattern", newPattern)
+      this.$store.commit('rotateTile')
       this.mouseOver()
     },
     resetAllCells () {

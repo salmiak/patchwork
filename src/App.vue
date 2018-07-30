@@ -7,8 +7,9 @@
           <p>
             <i class="fal fa-bullseye" /> {{currentPlayer.buttonsInPocket}}
           </p>
-          <quilt-board :tile="tile" :player="currentPlayer" @tilestored="tileStored" />
+          <quilt-board :tile="tile" :player="currentPlayer" />
           <button @click="mirrorTile">Mirror Tile</button>
+          <button @click="rotateTile">Rotate Tile</button>
         </div>
 
         <div v-if="otherPlayer.index === player.index" :key="player.index" :class="[`player${player.index}`]" class="boardContainer">
@@ -26,7 +27,7 @@
       </div>
     </div>
 
-    <tile-list @tileselected="tileSelected" />
+    <tile-list />
 
     <!--<button @click="$store.commit('gameOver')">Debug: End game</button>-->
 
@@ -73,11 +74,6 @@ export default {
     PlayBoard,
     TileList
   },
-  data () {
-    return {
-      tile: undefined
-    }
-  },
   computed: {
     currentPlayer () {
       return this.$store.getters.currentPlayer
@@ -91,27 +87,11 @@ export default {
       }
       return _.maxBy(this.$store.state.players, 'endScore').name
     },
+    tile () {
+      return this.$store.state.currentTile
+    },
     miniTile () {
       return this.$store.state.miniTile
-    }
-  },
-  watch: {
-    miniTile (newVal) {
-      if (newVal === true) {
-        this.tile = {
-          'id': null,
-          'pattern': [
-            [1]
-          ],
-          'offset': {
-            'x': 0,
-            'y': 0
-          },
-          'time': 0,
-          'cost': 0,
-          'buttons': 0
-        }
-      }
     }
   },
   created () {
@@ -119,30 +99,10 @@ export default {
   },
   methods: {
     mirrorTile () {
-      if (!this.tile) {
-        return false
-      }
-
-      this.tile.pattern.forEach((row) => {
-        var newRow = _.reverse(row)
-        row = newRow
-      })
-      this.mouseOver()
+      this.$store.commit('mirrorTile')
     },
-    tileSelected (tile) {
-      if (this.miniTile) {
-        // eslint-disable-next-line
-        return console.log('you have to play this tile')
-      }
-      this.tile = tile
-    },
-    tileStored (tile) {
-      this.$store.commit('resetMiniTile')
-      this.$store.commit('balancePlayersPocket', -1 * tile.cost)
-      this.$store.commit('increasePlayersBoardButtons', tile.buttons)
-      this.$store.commit('removeTileFromArray', tile)
-      this.tile = undefined
-      this.$store.commit('increasePlayerProgress', tile.time)
+    rotateTile () {
+      this.$store.commit('rotateTile')
     },
     goForward () {
       if (this.miniTile) {

@@ -38,6 +38,7 @@ const store = new Vuex.Store({
     ],
     tileIdArray: _.concat(0, _.shuffle(_.range(1, tiles.length))),
     miniTile: false,
+    currentTile: undefined,
     patchesPos: [20, 26, 32, 44, 50],
     patches: [20, 26, 32, 44, 50],
     buttons: [4, 10, 16, 22, 28, 34, 40, 46, 52]
@@ -87,19 +88,78 @@ const store = new Vuex.Store({
         })
       })
     },
+    setCurrentTile (state, tile) {
+      if (state.miniTile) {
+        // eslint-disable-next-line
+        console.log('You have to play this tile')
+        return false
+      }
+      state.currentTile = tile
+    },
+    setMinitTile (state) {
+      var miniTile = {
+        'id': null,
+        'pattern': [
+          [1]
+        ],
+        'offset': {
+          'x': 0,
+          'y': 0
+        },
+        'time': 0,
+        'cost': 0,
+        'buttons': 0
+      }
+      this.commit('setCurrentTile', miniTile)
+      state.miniTile = true
+    },
+    resetTiles (state) {
+      state.currentTile = undefined
+      state.miniTile = false
+    },
+    mirrorTile (state) {
+      if (!state.currentTile) {
+        return false
+      }
+
+      state.currentTile.pattern.forEach((row) => {
+        var newRow = _.reverse(row)
+        row = newRow
+      })
+    },
+    rotateTile (state) {
+      if (!state.currentTile) {
+        return false
+      }
+
+      var newPattern = []
+      for (var i = 0; i < state.currentTile.pattern[0].length; i++) {
+        newPattern.push(new Array(state.currentTile.pattern.length))
+      }
+      state.currentTile.pattern.forEach((row,y) => {
+        row.forEach((cell,x) => {
+          newPattern[newPattern.length-x-1][y] = cell
+        })
+      })
+      Vue.set(state.currentTile, "pattern", newPattern)
+    },
     storeTile (state) {
+      var tile = state.currentTile
       state.players.forEach(player => {
         player.cells.forEach(cell => {
           cell.value = cell.hovered || cell.value
         })
       })
+      this.commit('unhoverAllCells')
+      this.commit('resetTiles')
+      this.commit('removeTileFromArray', tile)
+      this.commit('balancePlayersPocket', -1 * tile.cost)
+      this.commit('increasePlayersBoardButtons', tile.buttons)
+      this.commit('increasePlayerProgress', tile.time)
     },
     removeTileFromArray (state, tile) {
       var toEnd = state.tileIdArray.splice(0, state.tileIdArray.indexOf(tile.id))
       state.tileIdArray = _.chain(state.tileIdArray).concat(toEnd).without(tile.id).value()
-    },
-    resetMiniTile (state) {
-      state.miniTile = false
     },
     increasePlayerProgress (state, steps) {
       var curPlayer = state.players[state.currentlyPlaying]
@@ -114,7 +174,7 @@ const store = new Vuex.Store({
         }
       })
       if (state.patches[0] <= curPlayer.pos) {
-        state.miniTile = true
+        this.commit('setMinitTile')
         state.patches.shift()
       } else if (curPlayer.pos + this.getters.currentNotPlayer.pos >= maxPos * 2) {
         this.commit('gameOver')
@@ -139,8 +199,6 @@ const store = new Vuex.Store({
         })
         player.boardPenelty = (quiltBoardSize * quiltBoardSize - cellsFilled) * 2
         player.endScore = player.buttonsInPocket - player.boardPenelty
-        // eslint-disable-next-line
-        console.log(player.board)
       })
     }
   }

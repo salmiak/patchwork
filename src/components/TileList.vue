@@ -28,7 +28,7 @@ export default {
   },
   methods: {
     selectTile (tile) {
-      this.$emit('tileselected', tile)
+      this.$store.commit('setCurrentTile', tile)
     }
   }
 }
