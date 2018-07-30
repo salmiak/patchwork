@@ -8,8 +8,14 @@
             <i class="fal fa-bullseye" /> {{currentPlayer.buttonsInPocket}}
           </p>
           <quilt-board :tile="tile" :player="currentPlayer" />
-          <button @click="mirrorTile">Mirror Tile</button>
-          <button @click="rotateTile">Rotate Tile</button>
+          <div v-if="tile">
+            <tile-mini :tile-data="tile" />
+            <button @click="mirrorTile">Mirror Tile</button>
+            <button @click="rotateTile">Rotate Tile</button>
+          </div>
+          <div v-else>
+            Select a tile from the list below, or go forward.
+          </div>
         </div>
 
         <div v-if="otherPlayer.index === player.index" :key="player.index" :class="[`player${player.index}`]" class="boardContainer">
@@ -65,6 +71,7 @@ import QuiltBoard from './components/QuiltBoard.vue'
 import QuiltBoardMini from './components/QuiltBoardMini.vue'
 import PlayBoard from './components/PlayBoard.vue'
 import TileList from './components/TileList.vue'
+import TileMini from './components/TileMini.vue'
 
 export default {
   name: 'app',
@@ -72,7 +79,8 @@ export default {
     QuiltBoard,
     QuiltBoardMini,
     PlayBoard,
-    TileList
+    TileList,
+    TileMini
   },
   computed: {
     currentPlayer () {
