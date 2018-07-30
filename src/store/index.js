@@ -122,10 +122,11 @@ const store = new Vuex.Store({
         return false
       }
 
+      var newPattern = []
       state.currentTile.pattern.forEach((row) => {
-        var newRow = _.reverse(row)
-        row = newRow
+        newPattern.push(_.reverse(row))
       })
+      Vue.set(state.currentTile, "pattern", newPattern)
     },
     rotateTile (state) {
       if (!state.currentTile) {
