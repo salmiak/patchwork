@@ -77,8 +77,8 @@ const store = new Vuex.Store({
         player.board = board
       })
     },
-    hoverCell (state, {cell}) {
-      Vue.set(cell, 'hovered', 1)
+    hoverCell (state, {cell, button}) {
+      Vue.set(cell, 'hovered', button?2:1)
     },
     unhoverAllCells (state) {
       state.players.forEach(player => {
@@ -134,7 +134,9 @@ const store = new Vuex.Store({
     gameOver (state) {
       state.gameOver = true
       state.players.forEach(player => {
-        var cellsFilled = _.sumBy(player.cells, 'value')
+        var cellsFilled = _.sumBy(player.cells, cell => {
+          return cell.value?1:0;
+        })
         player.boardPenelty = (quiltBoardSize * quiltBoardSize - cellsFilled) * 2
         player.endScore = player.buttonsInPocket - player.boardPenelty
         // eslint-disable-next-line

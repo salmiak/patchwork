@@ -1,7 +1,7 @@
 <template>
   <div class="board">
     <div v-for="(row,index) in player.board" v-bind:key="`row-${index}-mini`" class="row">
-      <div v-for="(cell,index) in row" v-bind:key="`cell-${index}-mini`" :class="{filled:cell.value}" class="cell">&nbsp;</div>
+      <div v-for="(cell,index) in row" v-bind:key="`cell-${index}-mini`" :class="{filled:cell.value, button:cell.value === 2}" class="cell">&nbsp;</div>
     </div>
   </div>
 </template>
@@ -51,6 +51,9 @@ export default {
     background: #FFF;
     &.filled {
       background: #FDD;
+    }
+    &.button {
+      background: blue;
     }
   }
 }

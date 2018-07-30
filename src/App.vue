@@ -27,7 +27,7 @@
 
     <tile-list @tileselected="tileSelected" />
 
-    <!-- <button @click="$store.commit('gameOver')">Debug: End game</button> -->
+    <!--<button @click="$store.commit('gameOver')">Debug: End game</button>-->
 
     <div v-if="$store.state.gameOver" id="gameOver">
       <h3>Game Over</h3>

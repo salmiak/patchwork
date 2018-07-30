@@ -1,7 +1,7 @@
 <template>
   <div :class="{hit: hit}" class="board" @mouseout="resetAllCells()">
     <div v-for="(row,index) in player.board" v-bind:key="`row-${index}`" class="row">
-      <div v-for="(cell,index) in row" v-bind:key="`cell-${index}`" :class="{filled:cell.value, hovered:cell.hovered}" class="cell"  @mouseover="mouseOver(cell)" @click="storeTile" @contextmenu.prevent="rotateTile($event)">&nbsp;</div>
+      <div v-for="(cell,index) in row" v-bind:key="`cell-${index}`" :class="{filled:cell.value, hovered:cell.hovered, button:cell.value === 2}" class="cell"  @mouseover="mouseOver(cell)" @click="storeTile" @contextmenu.prevent="rotateTile($event)">&nbsp;</div>
     </div>
   </div>
 </template>
@@ -41,7 +41,7 @@ export default {
           if(tileCell) {
             var curCell = this.getCellAt(this.cursor.x + dx - this.tile.offset.x, this.cursor.y + dy - this.tile.offset.y)
             if (curCell) {
-              this.$store.commit('hoverCell', {cell: curCell})
+              this.$store.commit('hoverCell', {cell: curCell, button: tileCell===2})
               this.hit = this.hit || curCell.value
             }
           }
@@ -123,6 +123,9 @@ export default {
       &.hovered {
         background: #CAA;
       }
+    }
+    &.button {
+      background: blue;
     }
   }
 }
