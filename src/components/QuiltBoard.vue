@@ -74,16 +74,15 @@ export default {
   margin: 10px auto;
   width: @quiltBoardCells * @size;
   height: @quiltBoardCells * @size;
-  border: 1px solid #DDD;
+  border: 1px solid @cBorder;
+  border-bottom: none;
+  border-right: none;
   box-sizing: content-box;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: stretch;
   align-content: stretch;
-  &.hit {
-    border-color: red;
-  }
   .row {
     width: 100%;
     height: @size;
@@ -97,19 +96,21 @@ export default {
     display: block;
     width: @size;
     height: @size;
-    border: 1px solid #DDD;
-    background: #FFF;
+    border: 1px solid @cBorder;
+    border-top: none;
+    border-left: none;
+    background: @cLightSurface;
     &.hovered {
-      background: #CCC;
+      background: fade(@cBackground, 30%);
     }
     &.filled {
-      background: #FDD;
+      background: lighten(@cBackground, 10%);
       &.hovered {
-        background: #CAA;
+        background: multiply(lighten(@cBackground, 10%), red);
       }
     }
     &.button {
-      background: blue;
+      .tileButton;
     }
   }
 }

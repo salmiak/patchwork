@@ -27,7 +27,9 @@ export default {
   margin: 10px auto;
   width: @quiltBoardCells * @size;
   height: @quiltBoardCells * @size;
-  border: 1px solid #DDD;
+  border: 1px solid @cBorder;
+  border-top: none;
+  border-left: none;
   box-sizing: content-box;
   display: flex;
   flex-wrap: wrap;
@@ -47,13 +49,15 @@ export default {
     display: block;
     width: @size;
     height: @size;
-    border: 1px solid #DDD;
-    background: #FFF;
+    border: 1px solid @cBorder;
+    border-bottom: none;
+    border-right: none;
+    background: @cLightSurface;
     &.filled {
-      background: #FDD;
+      background: lighten(@cBackground, 10%);
     }
     &.button {
-      background: blue;
+      .smallButton;
     }
   }
 }

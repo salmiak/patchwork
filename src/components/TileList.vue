@@ -34,7 +34,8 @@ export default {
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
+@import '../assets/base.less';
 .tileList {
   margin: 10px 0;
   display: flex;
@@ -42,18 +43,22 @@ export default {
   align-content: stretch;
   overflow-x: auto;
   overflow-y: visible;
+  min-height: @quiltBoardCellsSize * 7;
   li {
     padding: 10px;
     display: block;
     width: 15%;
     flex-grow: 0;
     flex-shrink: 0;
-    background: #CEE;
+    background: @cLightSurface;
     &:nth-child(1), &:nth-child(2), &:nth-child(3) {
-      background: darken(#CEE, 10%);
+      background: none;
+    }
+    &:nth-child(4) {
+      border-radius: 10px 0 0 10px;
     }
     .not-selectable {
-      opacity: 0.6;
+      opacity: 0.7;
     }
     .tileInfo {
       margin-bottom: 6px;

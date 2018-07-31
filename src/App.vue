@@ -2,6 +2,7 @@
   <div id="app" :class="{isPlayer1: currentPlayer.index === 0, isPlayer2: currentPlayer.index === 1}">
     <div class="boardsArea">
       <template v-for="player in $store.state.players">
+
         <div v-if="currentPlayer.index === player.index" :key="player.index" :class="[`player${player.index}`]" class="boardContainer isActive">
           <h2>{{currentPlayer.name}}'s turn</h2>
           <p>
@@ -136,7 +137,7 @@ export default {
   box-sizing: border-box;
 }
 body {
-  background: #566;
+  background: @cBackground;
   display: flex;
   width: 100vw;
   min-height: 100vh;
@@ -145,11 +146,12 @@ body {
 }
 button {
   border: none;
-  background: lightgreen;
+  background: @cButton;
+  color: @cButtonLabel;
+  font-weight: 600;
   padding: 0 1em;
   line-height: 2em;
-  border-radius: 4px;
-  box-shadow: 0 2px 6px fade(black, 30%);
+  border-radius: 16px;
   font-family: inherit;
   font-size: inherit;
 }
@@ -158,19 +160,18 @@ button {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color: @cText;
   width: 95%;
   min-width: 800px;
   max-width: 1024px;
   padding: 1px 0;
-  background: #F5F5F5;
   border-radius: 6px;
   box-shadow: 0 4px 32px fade(black, 80%), 0 16px 64px fade(black, 24%);
   &.isPlayer1 {
-    background: lighten(lightgreen, 10%);
+    background: @cGreenBg;
   }
   &.isPlayer2 {
-    background: lightyellow;
+    background: @cYellowBg;
   }
 }
 .boardsArea {
@@ -178,14 +179,16 @@ button {
   width: 95%;
   margin: 2.5vh auto;
   justify-content: space-between;
-  align-items: center;
+  align-items: stretch;
+  align-content: stretch;
   .boardContainer {
+    flex-grow: 1;
     text-align: center;
-    // outline: 1px solid red;
     &.player0 { order: 1 }
     &.player1 { order: 3 }
     &:nth-child(3) {
       order: 2;
+      align-self: center;
     }
   }
 }
@@ -194,7 +197,7 @@ button {
   line-height: @miniCellSize * 7;
   border-radius: @miniCellSize * 9;
   padding: @miniCellSize;
-  background: lighten(lightgreen, 15%);
+  background: @cLightSurface;
   button {
     margin-right: 10px;
   }

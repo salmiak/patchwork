@@ -60,15 +60,15 @@ export default {
 @size: @playBoardCellSize;
 @cells: 8;
 @buttonSize: @playBoardCellSize * 0.8;
-@border: 1px solid #222;
-@color1: lightgreen;
-@color2: pink;
+@border: 1px solid @cBorder;
+@color1: lighten(@cBackground, 25%);
+@color2: lighten(@cBackground, 10%);
 #playBoard {
   width: @cells * @size;
   height: @cells * @size;
   position: relative;
   box-sizing: content-box;
-  margin: 20px;
+  margin: 20px auto;
 }
 .section {
   display: flex;
@@ -125,19 +125,19 @@ export default {
         left: @playerSize * -0.2
       }
       &1 {
-        background: green;
-        box-shadow: 3px 3px 0 0 lighten(green, 10%);
+        background: @cGreen;
+        box-shadow: 3px 3px 0 0 darken(@cGreen, 10%);
       }
       &2 {
-        background: yellow;
-        box-shadow: 3px 3px 0 0 darken(yellow, 10%);
+        background: @cYellow;
+        box-shadow: 3px 3px 0 0 darken(@cYellow, 10%);
       }
     }
     .patch {
       display: block;
       width: @quiltBoardCellsSize;
       height: @quiltBoardCellsSize;
-      background: #985;
+      background: lighten(@cGreen, 30%);
       position: absolute;
       top: (@size - 1 - @quiltBoardCellsSize)/2;
       left: 0;
@@ -149,22 +149,23 @@ export default {
       width: @buttonSize;
       height: @buttonSize;
       border-radius: @buttonSize;
-      border: 3px solid blue;
-      background: lightblue;
+      border: 3px solid @cYellow;
+      background: @cYellowBg;
       position: absolute;
       top: (@size - @buttonSize)/2;
       right: @buttonSize/-2;
       z-index: 100;
       box-sizing: border-box;
       &::before {
+        @color: @cBackground;
         @holeSize: 2px;
         content: '';
         display: block;
         width: @holeSize;
         height: @holeSize;
         border-radius: @holeSize*2;
-        background: blue;
-        box-shadow: 0 @holeSize*2 0 blue, @holeSize*2 @holeSize*2 0 blue, @holeSize*2 0 0 blue;
+        background: @color;
+        box-shadow: 0 @holeSize*2 0 @color, @holeSize*2 @holeSize*2 0 @color, @holeSize*2 0 0 @color;
         position: absolute;
         top: 50%;
         left: 50%;

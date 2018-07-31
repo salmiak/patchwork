@@ -1,4 +1,74 @@
+@cBackground: #2c3e50; // #467;
+@cButton: lighten(@cBackground, 0%);
+@cButtonLabel: lighten(@cButton, 60%);
+@cText: fade(darken(@cBackground, 10%), 70%);
+
+@cGreen: #395;
+@cGreenBg: lighten(@cGreen, 40%);
+
+@cYellow: #FA0;
+@cYellowBg: lighten(@cYellow, 40%);
+
+@cLightSurface: fade(white, 40%);
+@cBorder: darken(@cBackground, 10%);
+
 @quiltBoardCells: 9;
 @quiltBoardCellsSize: 32px;
 @playBoardCellSize: @quiltBoardCellsSize * 9/8;
 @miniCellSize: @quiltBoardCellsSize * 0.25;
+@buttonSize: @quiltBoardCellsSize * 0.75;
+
+.tileButton {
+  @size: @quiltBoardCellsSize;
+  position: relative;
+  &::after {
+    content: '';
+    display: block;
+    width: @buttonSize;
+    height: @buttonSize;
+    border-radius: @buttonSize;
+    border: 3px solid @cYellow;
+    background: @cYellowBg;
+    position: absolute;
+    top: (@size - @buttonSize)/2 - 1px;
+    left: (@size - @buttonSize)/2 - 1px;
+    z-index: 100;
+    box-sizing: border-box;
+  }
+  &::before {
+    @color: @cBackground;
+    @holeSize: 2px;
+    content: '';
+    display: block;
+    width: @holeSize;
+    height: @holeSize;
+    border-radius: @holeSize*2;
+    background: @color;
+    box-shadow: 0 @holeSize*2 0 @color, @holeSize*2 @holeSize*2 0 @color, @holeSize*2 0 0 @color;
+    position: absolute;
+    top: calc(50% - 1px);
+    left: calc(50% - 1px);
+    transform: translate(-1*@holeSize,-1*@holeSize);
+    z-index: 150;
+    box-sizing: border-box;
+  }
+}
+
+.smallButton {
+  @size: @miniCellSize;
+  @buttonSize: calc(@size - 3px);
+  position: relative;
+  &::after {
+    content: '';
+    display: block;
+    width: @buttonSize;
+    height: @buttonSize;
+    border-radius: @buttonSize;
+    background: @cYellow;
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    z-index: 100;
+    box-sizing: border-box;
+  }
+}

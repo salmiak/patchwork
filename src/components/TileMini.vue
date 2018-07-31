@@ -26,16 +26,13 @@ export default {
   height: @size*7;
   vertical-align: middle;
   border-radius: 100%;
-  background: darken(lightgreen, 10%);
+  background: @cButtonLabel;
   margin: 0 10px 0 0;
 }
 .tile {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  &.hit {
-    border-color: red;
-  }
   .row {
     width: 100%;
     height: @size;
@@ -50,11 +47,10 @@ export default {
     width: @size;
     height: @size;
     &.filled {
-      background: #DDD;
+      background: @cBackground;
     }
     &.button {
-      position: relative;
-      background: blue;
+      .smallButton;
     }
   }
 }
