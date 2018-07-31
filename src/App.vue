@@ -54,7 +54,7 @@
             <strong>Buttons</strong> {{p.buttonsInPocket}}
           </li>
           <li>
-            <strong>Penelty</strong> {{p.boardPenelty}}
+            <strong>Penalty</strong> {{p.boardPenalty}}
           </li>
           <li>
             <strong>Total</strong> {{p.endScore}}

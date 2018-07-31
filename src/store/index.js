@@ -21,7 +21,7 @@ const store = new Vuex.Store({
         buttonsInPocket: 5,
         board: [[0]],
         cells: [],
-        boardPenelty: 0,
+        boardPenalty: 0,
         endScore: 0
       },
       {
@@ -32,7 +32,7 @@ const store = new Vuex.Store({
         buttonsInPocket: 5,
         board: [[0]],
         cells: [],
-        boardPenelty: 0,
+        boardPenalty: 0,
         endScore: 0
       }
     ],
@@ -198,8 +198,8 @@ const store = new Vuex.Store({
         var cellsFilled = _.sumBy(player.cells, cell => {
           return cell.value?1:0;
         })
-        player.boardPenelty = (quiltBoardSize * quiltBoardSize - cellsFilled) * 2
-        player.endScore = player.buttonsInPocket - player.boardPenelty
+        player.boardPenalty = (quiltBoardSize * quiltBoardSize - cellsFilled) * 2
+        player.endScore = player.buttonsInPocket - player.boardPenalty
       })
     }
   }
