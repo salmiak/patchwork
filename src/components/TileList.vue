@@ -37,13 +37,13 @@ export default {
 <style lang="less" scoped>
 @import '../assets/base.less';
 .tileList {
-  margin: 10px 0;
   display: flex;
   align-items: stretch;
   align-content: stretch;
   overflow-x: auto;
   overflow-y: visible;
   min-height: @quiltBoardCellsSize * 7;
+  border-radius: 0 0 6px 6px;
   li {
     padding: 10px;
     display: block;
@@ -55,7 +55,7 @@ export default {
       background: none;
     }
     &:nth-child(4) {
-      border-radius: 10px 0 0 10px;
+      border-radius: 12px 0 0 12px;
     }
     .not-selectable {
       opacity: 0.7;

@@ -71,7 +71,7 @@ export default {
 @size: @quiltBoardCellsSize;
 
 .board {
-  margin: 10px auto;
+  margin: 10px auto 0;
   width: @quiltBoardCells * @size;
   height: @quiltBoardCells * @size;
   border: 1px solid @cBorder;

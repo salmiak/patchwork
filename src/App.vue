@@ -4,39 +4,40 @@
       <template v-for="player in $store.state.players">
 
         <div v-if="currentPlayer.index === player.index" :key="player.index" :class="[`player${player.index}`]" class="boardContainer isActive">
-          <h2>{{currentPlayer.name}}'s turn</h2>
-          <p>
-            <i class="fal fa-bullseye" /> {{currentPlayer.buttonsInPocket}}
-          </p>
+          <h2>{{currentPlayer.name}} <span><i class="fal fa-bullseye" /> {{currentPlayer.buttonsInPocket}}</span></h2>
           <quilt-board :tile="tile" :player="currentPlayer" />
           <div v-if="tile" class="quiltBoardToolbar">
             <tile-mini :tile-data="tile" />
-            <button @click="mirrorTile">Mirror Tile</button>
-            <button @click="rotateTile">Rotate Tile</button>
+            <template v-if="$store.state.miniTile">
+              Place this tile to continue.
+            </template>
+            <template v-else>
+              <button @click="mirrorTile"><i class="fal fa-sync" /> Mirror Tile</button>
+              <button @click="rotateTile"><i class="fal fa-sync" /> Rotate Tile</button>
+            </template>
           </div>
           <div v-else class="quiltBoardToolbar">
-            Select a tile or go forward.
+            <center>
+              Select a tile or go forward.
+            </center>
           </div>
         </div>
 
         <div v-if="otherPlayer.index === player.index" :key="player.index" :class="[`player${player.index}`]" class="boardContainer">
-          <h3>{{otherPlayer.name}}</h3>
-          <p>
-            <i class="fal fa-bullseye" /> {{otherPlayer.buttonsInPocket}}
-          </p>
+          <h2>{{otherPlayer.name}} <span><i class="fal fa-bullseye" /> {{otherPlayer.buttonsInPocket}}</span></h2>
           <quilt-board-mini :player="otherPlayer" />
         </div>
       </template>
 
       <div class="boardContainer">
         <play-board />
-        <button v-if="!miniTile" @click="goForward">Go forward</button>
+        <button v-if="!miniTile" @click="goForward"><i class="fal fa-arrow-right" /> Go forward</button>
       </div>
     </div>
 
     <tile-list />
 
-    <!--<button @click="$store.commit('gameOver')">Debug: End game</button>-->
+    <!-- <button @click="$store.commit('gameOver')">Debug: End game</button> -->
 
     <div v-if="$store.state.gameOver" id="gameOver">
       <h3>Game Over</h3>
@@ -46,20 +47,22 @@
       <h1 v-else>
         It's a tie!!
       </h1>
-      <div v-for="p in $store.state.players" :key="p.index">
-        <h3>{{p.name}}</h3>
-        <quilt-board-mini :player="p" />
-        <ul>
-          <li>
-            <strong>Buttons</strong> {{p.buttonsInPocket}}
-          </li>
-          <li>
-            <strong>Penalty</strong> {{p.boardPenalty}}
-          </li>
-          <li>
-            <strong>Total</strong> {{p.endScore}}
-          </li>
-        </ul>
+      <div class="playersContainer">
+        <div v-for="p in $store.state.players" :key="p.index" class="player">
+          <h3>{{p.name}}</h3>
+          <quilt-board-mini :player="p" />
+          <ul>
+            <li>
+              <strong>Buttons</strong> {{p.buttonsInPocket}}
+            </li>
+            <li>
+              <strong>Penalty</strong> {{p.boardPenalty}}
+            </li>
+            <li>
+              <strong>Total</strong> {{p.endScore}}
+            </li>
+          </ul>
+        </div>
       </div>
       <button @click="resetGame">Reset Game</button>
     </div>
@@ -136,6 +139,9 @@ export default {
   padding: 0;
   box-sizing: border-box;
 }
+html {
+  font-size: 16px;
+}
 body {
   background: @cBackground;
   display: flex;
@@ -143,6 +149,16 @@ body {
   min-height: 100vh;
   justify-content: center;
   align-items: center;
+}
+h2,h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  span {
+    font-size: 1rem;
+    padding-left: .7rem;
+    margin-left: .5rem;
+    border-left: 1px solid @cText;
+  }
 }
 button {
   border: none;
@@ -154,6 +170,10 @@ button {
   border-radius: 16px;
   font-family: inherit;
   font-size: inherit;
+  .fal {
+    margin-left: -.3em;
+    margin-right: .3em;
+  }
 }
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
@@ -177,7 +197,7 @@ button {
 .boardsArea {
   display: flex;
   width: 95%;
-  margin: 2.5vh auto;
+  margin: 10px auto @miniCellSize;
   justify-content: space-between;
   align-items: stretch;
   align-content: stretch;
@@ -188,18 +208,21 @@ button {
     &.player1 { order: 3 }
     &:nth-child(3) {
       order: 2;
-      align-self: center;
+      padding-top: 1rem;
     }
   }
 }
 .quiltBoardToolbar {
   height: @miniCellSize * 9;
+  width: @quiltBoardCells * @quiltBoardCellsSize + @miniCellSize * 9;
+  margin: @miniCellSize auto 0;
   line-height: @miniCellSize * 7;
   border-radius: @miniCellSize * 9;
   padding: @miniCellSize;
   background: @cLightSurface;
+  text-align: left;
   button {
-    margin-right: 10px;
+    margin-right: 6px;
   }
 }
 #gameOver {
@@ -211,9 +234,40 @@ button {
   right: 0;
   bottom: 0;
   z-index: 9000;
-  padding: 20vh;
+  padding: 10vh;
   li {
     list-style: none;
+    &:last-child {
+      font-size: 1.2rem;
+      margin-top: .5rem;
+    }
+  }
+  .playersContainer {
+    display: flex;
+    width: 420px;
+    margin: 40px auto 60px;
+    justify-content: space-between;
+    .player {
+      color: @cText;
+      width: 200px;
+      background: @cYellowBg;
+      padding: 20px 0 30px;
+      border-radius: 6px;
+      &:first-child {
+        background: @cGreenBg;
+      }
+      h3 {
+        margin-bottom: 1rem;
+        color: @cBackground;
+      }
+      .board {
+        margin: 1rem auto;
+      }
+    }
+  }
+  button {
+    background: @cButtonLabel;
+    color: @cButton;
   }
 }
 </style>

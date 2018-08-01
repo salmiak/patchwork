@@ -30,8 +30,8 @@
     border: 3px solid @cYellow;
     background: @cYellowBg;
     position: absolute;
-    top: (@size - @buttonSize)/2 - 1px;
-    left: (@size - @buttonSize)/2 - 1px;
+    top: (@size - @buttonSize)/2;
+    left: (@size - @buttonSize)/2;
     z-index: 100;
     box-sizing: border-box;
   }
@@ -46,7 +46,7 @@
     background: @color;
     box-shadow: 0 @holeSize*2 0 @color, @holeSize*2 @holeSize*2 0 @color, @holeSize*2 0 0 @color;
     position: absolute;
-    top: calc(50% - 1px);
+    top: calc(50%);
     left: calc(50% - 1px);
     transform: translate(-1*@holeSize,-1*@holeSize);
     z-index: 150;
