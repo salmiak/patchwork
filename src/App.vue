@@ -1,5 +1,9 @@
 <template>
   <div id="app" :class="{isPlayer1: currentPlayer.index === 0, isPlayer2: currentPlayer.index === 1}">
+    <div class="store">
+      <button class="small" @click="storeGame"><i class="fal fa-save" /> Save game</button>
+      <button class="small" @click="showStoredGames"><i class="fal fa-arrow-up"  /> Load game</button>
+    </div>
     <div class="boardsArea">
       <template v-for="player in $store.state.players">
 
@@ -39,7 +43,7 @@
 
     <!-- <button @click="$store.commit('gameOver')">Debug: End game</button> -->
 
-    <div v-if="$store.state.gameOver" id="gameOver">
+    <div v-if="$store.state.gameOver" class="gameOver overlay">
       <h3>Game Over</h3>
       <h1 v-if="winningPlayer">
         The winner is {{winningPlayer}}
@@ -66,6 +70,16 @@
       </div>
       <button @click="resetGame">Reset Game</button>
     </div>
+
+    <div v-if="storedGamesList" class="gameList overlay">
+      <h3>Click a game to load it</h3>
+      <ul>
+        <li v-for="game in storedGamesList" :key="game.id">
+          <span @click="loadGame(game.id)">{{game.name}}, {{game.date}}</span>  <i class="fal fa-trash" @click="removeStoredGame(game.id)" />
+        </li>
+      </ul>
+      <button @click="storedGamesList=undefined">Close list</button>
+    </div>
   </div>
 </template>
 
@@ -85,6 +99,11 @@ export default {
     PlayBoard,
     TileList,
     TileMini
+  },
+  data () {
+    return {
+      storedGamesList: undefined
+    }
   },
   computed: {
     currentPlayer () {
@@ -127,6 +146,53 @@ export default {
     },
     resetGame () {
       window.location.reload()
+    },
+    storeGame () {
+      let name = window.prompt('Give you game a name') || 'No name'
+      let timestamp = (new Date()).getTime()
+      let id = "pw_game_"+timestamp
+
+      let stateToStore = _.cloneDeep(this.$store.state)
+      stateToStore.players.forEach(player => {
+        delete player.board
+        player.cellsZipped = _.map(player.cells, cell => {
+          return [cell.id, cell.x, cell.y, cell.value]
+        })
+        delete player.cells
+      })
+      let gameToStore = {
+        name: name,
+        id: id,
+        timestamp: timestamp,
+        state: stateToStore
+      }
+      this.$cookies.set(id,btoa(JSON.stringify(gameToStore)))
+
+      let gamesList = this.$cookies.isKey('pw_games_list')?JSON.parse(atob(this.$cookies.get('pw_games_list'))):[]
+      gamesList.push({
+        name: name,
+        timestamp: timestamp,
+        id: id
+      });
+      this.$cookies.set('pw_games_list',btoa(JSON.stringify(gamesList)))
+    },
+    showStoredGames () {
+      this.storedGamesList = JSON.parse(atob(this.$cookies.get('pw_games_list')))
+      this.storedGamesList.forEach(game => {
+        game.date = (new Date(game.timestamp)).toLocaleString()
+      })
+    },
+    loadGame (id) {
+      let gameData = JSON.parse(atob(this.$cookies.get(id)))
+      this.$store.commit('storeLoadGame', gameData)
+      this.storedGamesList = undefined
+    },
+    removeStoredGame (id) {
+      this.$cookies.remove(id)
+      let gamesList = JSON.parse(atob(this.$cookies.get('pw_games_list')))
+      gamesList = _.reject(gamesList, {id: id})
+      this.storedGamesList = _.reject(this.storedGamesList, {id: id})
+      this.$cookies.set('pw_games_list',btoa(JSON.stringify(gamesList)))
     }
   }
 }
@@ -176,6 +242,7 @@ button {
   }
 }
 #app {
+  position: relative;
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -185,6 +252,7 @@ button {
   min-width: 800px;
   max-width: 1024px;
   padding: 1px 0;
+  margin: 1rem auto 4rem;
   border-radius: 6px;
   box-shadow: 0 4px 32px fade(black, 80%), 0 16px 64px fade(black, 24%);
   &.isPlayer1 {
@@ -192,6 +260,27 @@ button {
   }
   &.isPlayer2 {
     background: @cYellowBg;
+  }
+}
+.store {
+  position: absolute;
+  bottom: -2.4rem;
+  left: 0;
+  right: 0;
+  text-align: center;
+  line-height: 2.3rem;
+  button {
+    line-height: 1.2rem;
+    font-size: .7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin: 2px;
+    color: fade(@cButtonLabel, 60%);
+    background: none;
+    cursor: pointer;
+    &:hover {
+      color: @cButtonLabel;
+    }
   }
 }
 .boardsArea {
@@ -225,7 +314,7 @@ button {
     margin-right: 6px;
   }
 }
-#gameOver {
+.overlay {
   background: fade(#000, 70%);
   color: #FFF;
   position: fixed;
@@ -235,6 +324,12 @@ button {
   bottom: 0;
   z-index: 9000;
   padding: 10vh;
+  button {
+    background: @cButtonLabel;
+    color: @cButton;
+  }
+}
+.gameOver {
   li {
     list-style: none;
     &:last-child {
@@ -265,9 +360,28 @@ button {
       }
     }
   }
-  button {
-    background: @cButtonLabel;
-    color: @cButton;
+}
+.gameList {
+  h3 {
+    margin-bottom: 30px;
+  }
+  ul {
+    margin-bottom: 20px;
+  }
+  li {
+    list-style: none;
+    margin-bottom: 10px;
+    span:hover {
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    i {
+      margin-left: 10px;
+      cursor: pointer;
+      &:hover {
+        color: red;
+      }
+    }
   }
 }
 </style>

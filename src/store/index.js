@@ -1,9 +1,11 @@
 import _ from 'lodash'
 import Vue from 'vue'
 import Vuex from 'vuex'
+import VueCookies from 'vue-cookies'
 import tiles from '../assets/tiles.json'
 
 Vue.use(Vuex)
+Vue.use(VueCookies)
 
 const quiltBoardSize = 9
 const maxPos = 53
@@ -200,6 +202,23 @@ const store = new Vuex.Store({
         })
         player.boardPenalty = (quiltBoardSize * quiltBoardSize - cellsFilled) * 2
         player.endScore = player.buttonsInPocket - player.boardPenalty
+      })
+    },
+    storeLoadGame (state, gameData) {
+      gameData.state.players.forEach(player => {
+        player.cells = _.map(player.cellsZipped, cell => {
+          return {
+            id: cell[0],
+            x: cell[1],
+            y: cell[2],
+            value: cell[3]
+          }
+        })
+        delete player.cellsZipped
+        player.board = _.chunk(player.cells, quiltBoardSize)
+      })
+      _.forIn(gameData.state, (val, key) => {
+        Vue.set(state, key, _.cloneDeep(val))
       })
     }
   }
