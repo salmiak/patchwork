@@ -1,11 +1,9 @@
 import _ from 'lodash'
 import Vue from 'vue'
 import Vuex from 'vuex'
-import VueCookies from 'vue-cookies'
 import tiles from '../assets/tiles.json'
 
 Vue.use(Vuex)
-Vue.use(VueCookies)
 
 const quiltBoardSize = 9
 const maxPos = 53
@@ -60,6 +58,10 @@ const store = new Vuex.Store({
     }
   },
   mutations: {
+    SOCKET_CUSTOM_EMIT () {
+      // eslint-disable-next-line
+      console.log('this method from the store was fired by the socket server. eg: io.emit("customEmit", data)')
+    },
     generateBoards (state) {
       state.players.forEach(player => {
         let board = []
@@ -220,6 +222,17 @@ const store = new Vuex.Store({
       _.forIn(gameData.state, (val, key) => {
         Vue.set(state, key, _.cloneDeep(val))
       })
+    },
+    setNewState (state, gameData) {
+      _.forIn(gameData, (val, key) => {
+        Vue.set(state, key, _.cloneDeep(val))
+      })
+    }
+  },
+  actions: {
+    socket_connect: () => {
+      // eslint-disable-next-line
+      console.log('connected')
     }
   }
 })

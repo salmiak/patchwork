@@ -41,6 +41,10 @@
 
     <tile-list />
 
+    <div v-if="!currentlyPlaying" class="overlay">
+      Wait
+    </div>
+
     <!-- <button @click="$store.commit('gameOver')">Debug: End game</button> -->
 
     <div v-if="$store.state.gameOver" class="gameOver overlay">
@@ -102,10 +106,14 @@ export default {
   },
   data () {
     return {
-      storedGamesList: undefined
+      storedGamesList: undefined,
+      thisPlayerIndex: 0
     }
   },
   computed: {
+    currentlyPlaying () {
+      return this.$store.state.currentlyPlaying === this.thisPlayerIndex
+    },
     currentPlayer () {
       return this.$store.getters.currentPlayer
     },
@@ -125,8 +133,69 @@ export default {
       return this.$store.state.miniTile
     }
   },
+  watch: {
+    currentlyPlaying (newVal, oldVal) {
+      if (oldVal) {
+        // eslint-disable-next-line
+        console.log('I just completed my play, ping-syncing my state')
+        this.$socket.emit('stateSyncPing', this.$store.state)
+      }
+    }
+  },
   created () {
     this.$store.commit('generateBoards')
+  },
+  sockets:{
+    connect: function(){
+      // eslint-disable-next-line
+      console.log('socket connected')
+    },
+    playerIndex (index) {
+      // eslint-disable-next-line
+      console.log('received index' + index)
+      this.thisPlayerIndex = index
+    },
+    tooManyPlayers () {
+      // eslint-disable-next-line
+      console.log('Too many players, try again in a while.')
+    },
+    usersListUpdate (users) {
+      if (users[0] && users[1]) {
+        // eslint-disable-next-line
+        console.log('everyone is here, start the game')
+        if(this.thisPlayerIndex === 0) {
+          // eslint-disable-next-line
+          console.log('I am host, ping-syncing my state')
+          this.$socket.emit('stateSyncPing', this.$store.state)
+        }
+      } else {
+        // eslint-disable-next-line
+        console.log('waiting for more players')
+      }
+    },
+    stateSyncPong (state) {
+      // eslint-disable-next-line
+      console.log('I just received a new state')
+      this.$store.commit('setNewState', state)
+    }
+    /*
+    stateSync (state) {
+      // eslint-disable-next-line
+      console.log('recieved a state sync request:')
+      // eslint-disable-next-line
+      console.log(state)
+      if (!state) {
+        // eslint-disable-next-line
+        console.log('state undefined, sending my state')
+        this.$socket.emit('stateInit', this.$store.state)
+      } else {
+        // eslint-disable-next-line
+        console.log('state defined, changing my state')
+        this.thisPlayerIndex = 1
+        this.$store.commit('setNewState', state)
+      }
+    }
+    */
   },
   methods: {
     mirrorTile () {
