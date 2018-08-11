@@ -72,7 +72,8 @@ const store = new Vuex.Store({
               id: ''+x+y,
               x: x,
               y: y,
-              value: 0
+              value: 0,
+              lastMove: false
             }
             row.push(cell)
             player.cells.push(cell)
@@ -152,6 +153,7 @@ const store = new Vuex.Store({
       var tile = state.currentTile
       state.players.forEach(player => {
         player.cells.forEach(cell => {
+          cell.lastMove = !!cell.hovered
           cell.value = cell.hovered || cell.value
         })
       })
@@ -223,16 +225,43 @@ const store = new Vuex.Store({
         Vue.set(state, key, _.cloneDeep(val))
       })
     },
-    setNewState (state, gameData) {
-      _.forIn(gameData, (val, key) => {
+    initNewState (state, gameData) {
+      _.forIn(_.omit(gameData, ['players']), (val, key) => {
         Vue.set(state, key, _.cloneDeep(val))
       })
-    }
-  },
-  actions: {
-    socket_connect: () => {
-      // eslint-disable-next-line
-      console.log('connected')
+
+      if (gameData.players){
+        state.players.forEach( (player, index) => {
+          var gameDataPlayer = gameData.players[index]
+          player.buttonsInPocket = gameDataPlayer.buttonsInPocket
+          player.pos = gameDataPlayer.pos
+          gameDataPlayer.cells.forEach((cell, cIndex) => {
+            player.cells[cIndex].lastMove = cell.lastMove
+            player.cells[cIndex].value = cell.value
+          })
+        })
+      }
+    },
+    updateState (state, gameData) {
+      state.currentlyPlaying = gameData.currentlyPlaying
+      state.gameOver = gameData.gameOver
+      state.miniTile = gameData.miniTile
+      state.patches = gameData.patches
+      state.tileIdArray = gameData.tileIdArray
+
+      state.players.forEach( (player, index) => {
+        var gameDataPlayer = gameData.players[index]
+        player.buttonsInPocket = gameDataPlayer.buttonsInPocket
+        player.pos = gameDataPlayer.pos
+        gameDataPlayer.cells.forEach((cell, cIndex) => {
+          player.cells[cIndex].lastMove = cell.lastMove
+          player.cells[cIndex].value = cell.value
+        })
+      })
+
+      if(gameData.gameOver) {
+        this.commit('gameOver')
+      }
     }
   }
 })

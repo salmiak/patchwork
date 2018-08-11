@@ -1,12 +1,12 @@
-var app = require('express')();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
+var app = require('express')()
+var http = require('http').Server(app)
+var io = require('socket.io')(http)
 
 app.get('/', function(req, res){
-  res.sendFile(__dirname + '/index.html');
+  res.sendFile(__dirname + '/index.html')
 });
 
-// var state = undefined;
+var games = {}
 
 /*
   A: Connect - Server sends: Player index 0
@@ -16,62 +16,63 @@ app.get('/', function(req, res){
   A: Does first turn, on turn end sends state
   */
 
-var users = [false,false]
-
 io.on('connection', function (socket) {
 
-  if (!users[0]) {
-    socket.emit("playerIndex", 0)
-    users[0] = true
-    socket.userIndex = 0
-  } else if (!users[1]) {
-    socket.emit("playerIndex", 1)
-    users[1] = true
-    socket.userIndex = 1
-  } else {
-    socket.emit("tooManyPlayers")
-  }
+  socket.on('connect to', (hash) => {
 
-  io.emit("usersListUpdate", users)
+    if (!games[hash]) {
+      console.log('User created a new game ' + hash)
+      games[hash] = {
+        hash: hash,
+        players: [0, 0]
+      }
+    }
+
+    console.log('User connected to game ' + hash)
+
+    var index = games[hash].players.indexOf(0)
+
+    if (index === -1) {
+      console.log('Game is full, user refused')
+      socket.emit('gameFull')
+
+    } else {
+      games[hash].players[index] = socket.id
+      socket.currentGame = {
+        shared: games[hash],
+        playerIndex: index,
+        hash: hash
+      }
+      socket.join(hash)
+      socket.emit("gameInit", socket.currentGame)
+      console.log('User got index ' + index)
+    }
+  })
+
+  socket.on('init state', (state) => {
+    console.log('new state initiated')
+    socket.currentGame.shared.state = state
+    socket.broadcast.to(socket.currentGame.hash).emit('initNewState', state)
+  })
 
   socket.on('stateSyncPing', (state) => {
-    socket.broadcast.emit('stateSyncPong', state)
+    socket.currentGame.shared.state = state
+    socket.broadcast.to(socket.currentGame.hash).emit('stateSyncPong', state)
+  })
+
+  socket.on('gameOver', (state) => {
+    socket.broadcast.to(socket.currentGame.hash).emit('stateSyncPong', state)
+    delete games[socket.currentGame.hash]
   })
 
   socket.on('disconnect', function () {
-    console.log('user disconnected: ' + socket.userIndex)
-    users[socket.userIndex] = false
-    io.emit("usersListUpdate", users)
+    if (socket.currentGame) {
+      console.log('user ' + socket.currentGame.playerIndex + ' disconnected from ' + socket.currentGame.hash)
+      socket.currentGame.shared.players[socket.currentGame.playerIndex] = 0
+    } else {
+      console.log('User from a full game disconnected - ignored')
+    }
   });
-
-/*
-  socket.on('stateInit', function (newState) {
-    console.log('Received new state')
-    state = newState
-  })
-  socket.on('stateSync', (newState) => {
-    console.log('Synced state')
-    state = newState
-    io.emit("stateSync", state)
-  })
-
-  if (!state) {
-    console.log('a hosting user connected requesting new');
-    io.emit("stateSync")
-
-    socket.on('disconnect', function () {
-      console.log('hosting user disconnected');
-      state = undefined
-    });
-  } else {
-    console.log('a non hosting user connected - sending new state');
-    io.emit("stateSync", state)
-
-    socket.on('disconnect', function () {
-      console.log('non hosting user disconnected');
-    });
-  }
-  */
 
 });
 

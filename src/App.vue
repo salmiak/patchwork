@@ -45,9 +45,13 @@
       Wait
     </div>
 
-    <!-- <button @click="$store.commit('gameOver')">Debug: End game</button> -->
+    <div v-if="gameFull" class="overlay">
+      Game full - reload url to try again.
+    </div>
 
-    <div v-if="$store.state.gameOver" class="gameOver overlay">
+    <button @click="$store.commit('gameOver')">Debug: End game</button>
+
+    <div v-if="isGameOver" class="gameOver overlay">
       <h3>Game Over</h3>
       <h1 v-if="winningPlayer">
         The winner is {{winningPlayer}}
@@ -108,7 +112,8 @@ export default {
   data () {
     return {
       storedGamesList: undefined,
-      thisPlayerIndex: 0
+      gameFull: false,
+      gameData: undefined
     }
   },
   computed: {
@@ -117,7 +122,7 @@ export default {
     },
     currentlyPlaying () {
       if (this.isServerGame) {
-        return this.$store.state.currentlyPlaying === this.thisPlayerIndex
+        return this.gameData && this.$store.state.currentlyPlaying === this.gameData.playerIndex
       }
       return true
     },
@@ -138,14 +143,22 @@ export default {
     },
     miniTile () {
       return this.$store.state.miniTile
+    },
+    isGameOver () {
+      return this.$store.state.gameOver
     }
   },
   watch: {
     currentlyPlaying (newVal, oldVal) {
       if (oldVal && this.isServerGame) {
-        // eslint-disable-next-line
         console.log('I just completed my play, ping-syncing my state')
         this.$socket.emit('stateSyncPing', this.$store.state)
+      }
+    },
+    isGameOver (newVal) {
+      if (newVal) {
+        console.log('Game over, ping-syncing my state')
+        this.$socket.emit('gameOver', this.$store.state)
       }
     }
   },
@@ -153,42 +166,36 @@ export default {
     this.$store.commit('generateBoards')
   },
   sockets:{
-    connect: function(){
+    connect () {
       console.log('socket connected')
       if (this.isServerGame) {
         console.log('It is a server game with the hash: ' + this.$route.params.gameSession)
+        this.$socket.emit('connect to', this.$route.params.gameSession)
       } else {
         console.log('Ignoring connection, this is a local game only')
       }
     },
-    playerIndex (index) {
-      if (this.isServerGame) {
-        console.log('received index' + index)
-        this.thisPlayerIndex = index
+    gameFull () {
+      this.gameFull = true
+    },
+    gameInit (gameData) {
+      this.gameData = gameData
+      if (gameData.shared.state) {
+        console.log('We have a previous state, set this up')
+        this.$store.commit('initNewState', gameData.shared.state)
+      } else if (gameData.playerIndex === 0) {
+        console.log('We do not have a state and I am the first player, send my state')
+        this.$socket.emit('init state', _.pick(this.$store.state, [ 'tileIdArray']))
       }
     },
-    tooManyPlayers () {
-      if (this.isServerGame) {
-        console.log('Too many players, try again in a while.')
-      }
-    },
-    usersListUpdate (users) {
-      if (this.isServerGame) {
-        if (users[0] && users[1]) {
-          console.log('everyone is here, start the game')
-          if(this.thisPlayerIndex === 0) {
-            console.log('I am host, ping-syncing my state')
-            this.$socket.emit('stateSyncPing', this.$store.state)
-          }
-        } else {
-          console.log('waiting for more players')
-        }
-      }
+    initNewState (state) {
+      console.log('got new state, replacing old')
+      this.$store.commit('initNewState', state)
     },
     stateSyncPong (state) {
       if (this.isServerGame) {
         console.log('I just received a new state')
-        this.$store.commit('setNewState', state)
+        this.$store.commit('updateState', state)
       }
     }
   },
