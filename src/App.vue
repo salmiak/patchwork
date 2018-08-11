@@ -88,6 +88,7 @@
 </template>
 
 <script>
+/* eslint-disable no-console */
 import _ from 'lodash'
 import QuiltBoard from './components/QuiltBoard.vue'
 import QuiltBoardMini from './components/QuiltBoardMini.vue'
@@ -111,8 +112,14 @@ export default {
     }
   },
   computed: {
+    isServerGame () {
+      return !!this.$route.params.gameSession
+    },
     currentlyPlaying () {
-      return this.$store.state.currentlyPlaying === this.thisPlayerIndex
+      if (this.isServerGame) {
+        return this.$store.state.currentlyPlaying === this.thisPlayerIndex
+      }
+      return true
     },
     currentPlayer () {
       return this.$store.getters.currentPlayer
@@ -135,7 +142,7 @@ export default {
   },
   watch: {
     currentlyPlaying (newVal, oldVal) {
-      if (oldVal) {
+      if (oldVal && this.isServerGame) {
         // eslint-disable-next-line
         console.log('I just completed my play, ping-syncing my state')
         this.$socket.emit('stateSyncPing', this.$store.state)
@@ -147,55 +154,43 @@ export default {
   },
   sockets:{
     connect: function(){
-      // eslint-disable-next-line
       console.log('socket connected')
+      if (this.isServerGame) {
+        console.log('It is a server game with the hash: ' + this.$route.params.gameSession)
+      } else {
+        console.log('Ignoring connection, this is a local game only')
+      }
     },
     playerIndex (index) {
-      // eslint-disable-next-line
-      console.log('received index' + index)
-      this.thisPlayerIndex = index
+      if (this.isServerGame) {
+        console.log('received index' + index)
+        this.thisPlayerIndex = index
+      }
     },
     tooManyPlayers () {
-      // eslint-disable-next-line
-      console.log('Too many players, try again in a while.')
+      if (this.isServerGame) {
+        console.log('Too many players, try again in a while.')
+      }
     },
     usersListUpdate (users) {
-      if (users[0] && users[1]) {
-        // eslint-disable-next-line
-        console.log('everyone is here, start the game')
-        if(this.thisPlayerIndex === 0) {
-          // eslint-disable-next-line
-          console.log('I am host, ping-syncing my state')
-          this.$socket.emit('stateSyncPing', this.$store.state)
+      if (this.isServerGame) {
+        if (users[0] && users[1]) {
+          console.log('everyone is here, start the game')
+          if(this.thisPlayerIndex === 0) {
+            console.log('I am host, ping-syncing my state')
+            this.$socket.emit('stateSyncPing', this.$store.state)
+          }
+        } else {
+          console.log('waiting for more players')
         }
-      } else {
-        // eslint-disable-next-line
-        console.log('waiting for more players')
       }
     },
     stateSyncPong (state) {
-      // eslint-disable-next-line
-      console.log('I just received a new state')
-      this.$store.commit('setNewState', state)
-    }
-    /*
-    stateSync (state) {
-      // eslint-disable-next-line
-      console.log('recieved a state sync request:')
-      // eslint-disable-next-line
-      console.log(state)
-      if (!state) {
-        // eslint-disable-next-line
-        console.log('state undefined, sending my state')
-        this.$socket.emit('stateInit', this.$store.state)
-      } else {
-        // eslint-disable-next-line
-        console.log('state defined, changing my state')
-        this.thisPlayerIndex = 1
+      if (this.isServerGame) {
+        console.log('I just received a new state')
         this.$store.commit('setNewState', state)
       }
     }
-    */
   },
   methods: {
     mirrorTile () {
