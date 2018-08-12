@@ -1,7 +1,7 @@
 <template>
   <div :class="{hit: hit}" class="board" @mouseout="resetAllCells()">
     <div v-for="(row,rIndex) in player.board" v-bind:key="`row-${rIndex}`" class="row">
-      <div v-for="(cell) in row" v-bind:key="`cell-${cell.id}`" :class="{filled:cell.value, hovered:cell.hovered, button:cell.value === 2}" class="cell"  @mouseover="mouseOver(cell)" @click="storeTile" @contextmenu.prevent="rotateTile()">&nbsp;</div>
+      <div v-for="(cell) in row" v-bind:key="`cell-${cell.id}`" :class="{filled:cell.value, hovered:cell.hovered, recent:cell.lastMove, button:cell.value === 2}" class="cell"  @mouseover="mouseOver(cell)" @click="storeTile" @contextmenu.prevent="rotateTile()">&nbsp;</div>
     </div>
   </div>
 </template>

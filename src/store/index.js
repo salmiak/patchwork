@@ -153,7 +153,7 @@ const store = new Vuex.Store({
       var tile = state.currentTile
       state.players.forEach(player => {
         player.cells.forEach(cell => {
-          cell.lastMove = !!cell.hovered
+          cell.lastMove = !!cell.hovered || cell.lastMove
           cell.value = cell.hovered || cell.value
         })
       })
@@ -197,6 +197,9 @@ const store = new Vuex.Store({
     },
     nextPlayer (state) {
       state.currentlyPlaying = (state.currentlyPlaying + 1) % 2
+      state.players[state.currentlyPlaying].cells.forEach(cell => {
+        cell.lastMove = false
+      })
     },
     gameOver (state) {
       state.gameOver = true

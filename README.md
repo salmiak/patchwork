@@ -24,5 +24,8 @@ npm run lint
 http://anatolisgameroom.com/boardgame%20pics/DSC_0488.jpg
 
 ## ToDo
-- Fix layout and make things more clear
-- Move all play board-things into vuex
+- Add "create server game"-button.
+  - generate random hash
+  - Add a "invite a friend"-screen while waiting for other players.
+- Store state to database from server
+- Mark last-changed tiles

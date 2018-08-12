@@ -49,7 +49,7 @@
       Game full - reload url to try again.
     </div>
 
-    <button @click="$store.commit('gameOver')">Debug: End game</button>
+    <!-- <button @click="$store.commit('gameOver')">Debug: End game</button> -->
 
     <div v-if="isGameOver" class="gameOver overlay">
       <h3>Game Over</h3>
