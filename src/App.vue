@@ -41,7 +41,7 @@
 
     <tile-list />
 
-    <div v-if="!currentlyPlaying" class="overlay">
+    <div v-if="!currentlyPlaying && !isGameOver" class="overlay">
       Wait
     </div>
 
