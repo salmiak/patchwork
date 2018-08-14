@@ -28,4 +28,4 @@ http://anatolisgameroom.com/boardgame%20pics/DSC_0488.jpg
   - generate random hash
   - Add a "invite a friend"-screen while waiting for other players.
 - Store state to database from server
-- Mark last-changed tiles
+- Publish
