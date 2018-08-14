@@ -8,7 +8,7 @@ import router from './router'
 Vue.config.productionTip = false
 
 Vue.use(VueCookies)
-Vue.use(VueSocketio, 'http://localhost:3000')
+Vue.use(VueSocketio, '/')
 
 new Vue({
   store,
