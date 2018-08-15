@@ -154,13 +154,21 @@ const store = new Vuex.Store({
       this.commit('unhoverAllCells')
       this.commit('resetTiles')
       this.commit('removeTileFromArray', tile)
-      this.commit('balancePlayersPocket', -1 * tile.cost)
-      this.commit('increasePlayersBoardButtons', tile.buttons)
+      // this.commit('balancePlayersPocket', -1 * tile.cost)
+      state.players[state.currentlyPlaying].buttonsInPocket += -1 * tile.cost
+      // this.commit('increasePlayersBoardButtons', tile.buttons)
+      state.players[state.currentlyPlaying].buttonsOnBoard += tile.buttons
       this.commit('increasePlayerProgress', tile.time)
     },
     removeTileFromArray (state, tile) {
       var toEnd = state.tileIdArray.splice(0, state.tileIdArray.indexOf(tile.id))
       state.tileIdArray = _.chain(state.tileIdArray).concat(toEnd).without(tile.id).value()
+    },
+    balancePlayersPocket (state, amount) {
+      state.players[state.currentlyPlaying].buttonsInPocket += amount
+    },
+    increasePlayersBoardButtons (state, amount) {
+      state.players[state.currentlyPlaying].buttonsOnBoard += amount
     },
     increasePlayerProgress (state, steps) {
       var curPlayer = state.players[state.currentlyPlaying]
@@ -182,12 +190,6 @@ const store = new Vuex.Store({
       } else if (curPlayer.pos > this.getters.currentNotPlayer.pos) {
         this.commit('nextPlayer')
       }
-    },
-    balancePlayersPocket (state, amount) {
-      state.players[state.currentlyPlaying].buttonsInPocket += amount
-    },
-    increasePlayersBoardButtons (state, amount) {
-      state.players[state.currentlyPlaying].buttonsOnBoard += amount
     },
     nextPlayer (state) {
       state.currentlyPlaying = (state.currentlyPlaying + 1) % 2
@@ -230,6 +232,7 @@ const store = new Vuex.Store({
       if (gameData.players){
         state.players.forEach( (player, index) => {
           var gameDataPlayer = gameData.players[index]
+          player.buttonsOnBoard = gameDataPlayer.buttonsOnBoard
           player.buttonsInPocket = gameDataPlayer.buttonsInPocket
           player.pos = gameDataPlayer.pos
           gameDataPlayer.cells.forEach((cell, cIndex) => {
@@ -248,6 +251,7 @@ const store = new Vuex.Store({
 
       state.players.forEach( (player, index) => {
         var gameDataPlayer = gameData.players[index]
+        player.buttonsOnBoard = gameDataPlayer.buttonsOnBoard
         player.buttonsInPocket = gameDataPlayer.buttonsInPocket
         player.pos = gameDataPlayer.pos
         gameDataPlayer.cells.forEach((cell, cIndex) => {

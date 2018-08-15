@@ -30,4 +30,3 @@ http://anatolisgameroom.com/boardgame%20pics/DSC_0488.jpg
 - Add sound when turn is over to "me"
 - Add help texts
 - Make it work on mobile
-- BUG: Button on board not counted for when user uses "Go forward"
