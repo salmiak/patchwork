@@ -42,8 +42,10 @@
 
     <tile-list />
 
-    <div v-if="!currentlyPlaying && !isGameOver" class="overlay">
-      Wait
+    <div v-if="!currentlyPlaying && !isGameOver" class="waiting overlay">
+      <h1>Waiting for other player</h1>
+      <p>Invite another player to this game by inviting them to <span v-clipboard:copy="serverGameUrl" class="gameUrl">{{serverGameUrl}}</span>
+      </p>
     </div>
 
     <div v-if="gameFull" class="overlay">
@@ -119,6 +121,9 @@ export default {
     }
   },
   computed: {
+    serverGameUrl () {
+      return window.location.href
+    },
     isServerGame () {
       return !!this.$route.params.gameSession
     },
@@ -462,5 +467,21 @@ button {
       }
     }
   }
+}
+.waiting {
+  p {
+    max-width: 400px;
+    margin: 10px auto;
+  }
+}
+.gameUrl {
+  background: fade(@cButtonLabel, 75%);
+  color: @cButton;
+  font-weight: 500;
+  line-height: 2em;
+  padding: 0 .5em;
+  border-radius: 2px;
+  margin: 5px 0 0 0;
+  cursor: pointer;
 }
 </style>

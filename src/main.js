@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueCookies from 'vue-cookies'
 import VueSocketio from 'vue-socket.io'
+import VueClipboard from 'vue-clipboard2'
 import App from './App.vue'
 import store from './store'
 import router from './router'
@@ -13,6 +14,7 @@ if (process.env.NODE_ENV === "development") {
 } else {
   Vue.use(VueSocketio, '/')
 }
+Vue.use(VueClipboard)
 
 new Vue({
   store,
