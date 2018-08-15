@@ -24,7 +24,6 @@ npm run lint
 http://anatolisgameroom.com/boardgame%20pics/DSC_0488.jpg
 
 ## ToDo
-- Add a "invite a friend"-screen while waiting for other players.
 - Store state to database from server
 - Make wait screen more verbose
 - Add sound when turn is over to "me"
