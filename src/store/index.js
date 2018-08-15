@@ -58,10 +58,6 @@ const store = new Vuex.Store({
     }
   },
   mutations: {
-    SOCKET_CUSTOM_EMIT () {
-      // eslint-disable-next-line
-      console.log('this method from the store was fired by the socket server. eg: io.emit("customEmit", data)')
-    },
     generateBoards (state) {
       state.players.forEach(player => {
         let board = []
@@ -126,7 +122,6 @@ const store = new Vuex.Store({
       if (!state.currentTile) {
         return false
       }
-
       var newPattern = []
       state.currentTile.pattern.forEach((row) => {
         newPattern.push(_.reverse(row))
@@ -137,7 +132,6 @@ const store = new Vuex.Store({
       if (!state.currentTile) {
         return false
       }
-
       var newPattern = []
       for (var i = 0; i < state.currentTile.pattern[0].length; i++) {
         newPattern.push(new Array(state.currentTile.pattern.length))
