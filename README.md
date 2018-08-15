@@ -28,4 +28,7 @@ http://anatolisgameroom.com/boardgame%20pics/DSC_0488.jpg
   - generate random hash
   - Add a "invite a friend"-screen while waiting for other players.
 - Store state to database from server
-- Publish
+- Make wait screen more verbose
+- Add sound when turn is over to "me"
+- Add help texts
+- Make it work on mobile

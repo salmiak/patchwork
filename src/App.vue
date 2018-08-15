@@ -3,6 +3,7 @@
     <div class="store">
       <button class="small" @click="storeGame"><i class="fal fa-save" /> Save game</button>
       <button class="small" @click="showStoredGames"><i class="fal fa-arrow-up"  /> Load game</button>
+      <button class="small" @click="startNewServerGame"><i class="fal fa-globe-africa" /> Start online game</button>
     </div>
     <div class="boardsArea">
       <template v-for="player in $store.state.players">
@@ -94,6 +95,7 @@
 <script>
 /* eslint-disable no-console */
 import _ from 'lodash'
+import randomstring from 'randomstring'
 import QuiltBoard from './components/QuiltBoard.vue'
 import QuiltBoardMini from './components/QuiltBoardMini.vue'
 import PlayBoard from './components/PlayBoard.vue'
@@ -264,6 +266,10 @@ export default {
       gamesList = _.reject(gamesList, {id: id})
       this.storedGamesList = _.reject(this.storedGamesList, {id: id})
       this.$cookies.set('pw_games_list',btoa(JSON.stringify(gamesList)))
+    },
+    startNewServerGame () {
+      var hash = randomstring.generate()
+      this.$router.push({ path: `/${hash}`})
     }
   }
 }
