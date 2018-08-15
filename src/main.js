@@ -8,7 +8,11 @@ import router from './router'
 Vue.config.productionTip = false
 
 Vue.use(VueCookies)
-Vue.use(VueSocketio, '/')
+if (process.env.NODE_ENV === "development") {
+  Vue.use(VueSocketio, 'localhost:5000/')
+} else {
+  Vue.use(VueSocketio, '/')
+}
 
 new Vue({
   store,
