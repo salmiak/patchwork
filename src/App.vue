@@ -270,6 +270,8 @@ export default {
     startNewServerGame () {
       var hash = randomstring.generate()
       this.$router.push({ path: `/${hash}`})
+      // TODO: Handle this without reloading the page
+      this.$router.go(this.$router.currentRoute)
     }
   }
 }

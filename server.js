@@ -49,8 +49,10 @@ io.on('connection', function (socket) {
   })
 
   socket.on('stateSyncPing', (state) => {
-    socket.currentGame.shared.state = state
-    socket.broadcast.to(socket.currentGame.hash).emit('stateSyncPong', state)
+    if (socket.currentGame) {
+      socket.currentGame.shared.state = state
+      socket.broadcast.to(socket.currentGame.hash).emit('stateSyncPong', state)
+    }
   })
 
   socket.on('gameOver', (state) => {
