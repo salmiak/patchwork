@@ -1,6 +1,7 @@
 <template>
   <div id="app" :class="{isPlayer1: currentPlayer.index === 0, isPlayer2: currentPlayer.index === 1}">
     <div class="store">
+      <button class="small" @click="playSounds = !playSounds"><i :class="{'fa-volume-up': playSounds, 'fa-volume-mute':!playSounds}" class="fal" /> Toggle sound</button>
       <button class="small" @click="storeGame"><i class="fal fa-save" /> Save game</button>
       <button class="small" @click="showStoredGames"><i class="fal fa-arrow-up"  /> Load game</button>
       <button class="small" @click="startNewServerGame"><i class="fal fa-globe-africa" /> Start online game</button>
@@ -104,6 +105,10 @@ import PlayBoard from './components/PlayBoard.vue'
 import TileList from './components/TileList.vue'
 import TileMini from './components/TileMini.vue'
 
+const audio = {
+  ding: new Audio('http://soundbible.com/mp3/Air Plane Ding-SoundBible.com-496729130.mp3')
+}
+
 export default {
   name: 'app',
   components: {
@@ -117,7 +122,8 @@ export default {
     return {
       storedGamesList: undefined,
       gameFull: false,
-      gameData: undefined
+      gameData: undefined,
+      playSounds: true
     }
   },
   computed: {
@@ -160,6 +166,10 @@ export default {
       if (oldVal && this.isServerGame) {
         console.log('I just completed my play, ping-syncing my state')
         this.$socket.emit('stateSyncPing', this.$store.state)
+      } else {
+        if (this.playSounds) {
+          audio.ding.play();
+        }
       }
     },
     isGameOver (newVal) {
