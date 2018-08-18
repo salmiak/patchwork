@@ -1,47 +1,81 @@
 <template>
-  <div id="app" :class="{isPlayer1: currentPlayer.index === 0, isPlayer2: currentPlayer.index === 1}">
-    <div class="store">
-      <button class="small" @click="playSounds = !playSounds"><i :class="{'fa-volume-up': playSounds, 'fa-volume-mute':!playSounds}" class="fal" /> Toggle sound</button>
-      <button class="small" @click="storeGame"><i class="fal fa-save" /> Save game</button>
-      <button class="small" @click="showStoredGames"><i class="fal fa-arrow-up"  /> Load game</button>
-      <button class="small" @click="startNewServerGame"><i class="fal fa-globe-africa" /> Start online game</button>
-    </div>
-    <div class="boardsArea">
-      <template v-for="player in $store.state.players">
+  <div id="app" >
 
-        <div v-if="currentPlayer.index === player.index" :key="player.index" :class="[`player${player.index}`]" class="boardContainer isActive">
-          <h2>{{currentPlayer.name}} <span><i class="fal fa-bullseye" /> {{currentPlayer.buttonsInPocket}}</span></h2>
-          <quilt-board :tile="tile" :player="currentPlayer" />
-          <div v-if="tile" class="quiltBoardToolbar">
-            <tile-mini :tile-data="tile" />
-            <template v-if="$store.state.miniTile">
-              Place this tile to continue.
-            </template>
-            <template v-else>
-              <button @click="mirrorTile"><i class="fal fa-sync" /> Mirror Tile</button>
-              <button @click="rotateTile"><i class="fal fa-sync" /> Rotate Tile</button>
-            </template>
-          </div>
-          <div v-else class="quiltBoardToolbar">
-            <center>
-              Select a tile or go forward.
-            </center>
-          </div>
-        </div>
+    <div v-if="$root.isMobile" class="gamearea mobile">
 
-        <div v-if="otherPlayer.index === player.index" :key="player.index" :class="[`player${player.index}`]" class="boardContainer">
-          <h2>{{otherPlayer.name}} <span><i class="fal fa-bullseye" /> {{otherPlayer.buttonsInPocket}}</span></h2>
-          <quilt-board-mini :player="otherPlayer" />
-        </div>
-      </template>
+      <quilt-board :tile="tile" :player="currentPlayer" />
 
-      <div class="boardContainer">
+      <div class="boardsArea">
+        <quilt-board-mini :player="otherPlayer" />
         <play-board />
+      </div>
+
+      <div v-if="tile" class="mobileToolbar">
+        <p>
+          <tile-mini :tile-data="tile" />
+        </p>
+        <template v-if="$store.state.miniTile">
+          Place this tile to continue.
+          <button @click="$store.commit('storeTile')"><i class="fal fa-arrow-right"/> Play tile</button>
+        </template>
+        <template v-else>
+          <button @click="mirrorTile"><i class="fal fa-sync" /> Mirror Tile</button>&nbsp;
+          <button @click="rotateTile"><i class="fal fa-sync" /> Rotate Tile</button>
+          <button @click="clearSelectedTile"><i class="fal fa-arrow-left" /> Back to tiles</button>
+          <button @click="$store.commit('storeTile')"><i class="fal fa-arrow-right"/> Play tile</button>
+        </template>
+      </div>
+      <div v-else class="mobileToolbar">
+        <tile-list />
         <button v-if="!miniTile" @click="goForward"><i class="fal fa-arrow-right" /> Go forward</button>
       </div>
     </div>
 
-    <tile-list />
+    <div v-else :class="{isPlayer1: currentPlayer.index === 0, isPlayer2: currentPlayer.index === 1}" class="gamearea desktop">
+      <div class="store">
+        <button class="small" @click="playSounds = !playSounds"><i :class="{'fa-volume-up': playSounds, 'fa-volume-mute':!playSounds}" class="fal" /> Toggle sound</button>
+        <button class="small" @click="storeGame"><i class="fal fa-save" /> Save game</button>
+        <button class="small" @click="showStoredGames"><i class="fal fa-arrow-up"  /> Load game</button>
+        <button class="small" @click="startNewServerGame"><i class="fal fa-globe-africa" /> Start online game</button>
+      </div>
+      <div class="boardsArea">
+        <template v-for="player in $store.state.players">
+
+          <div v-if="currentPlayer.index === player.index" :key="player.index" :class="[`player${player.index}`]" class="boardContainer isActive">
+            <h2>{{currentPlayer.name}} <span><i class="fal fa-bullseye" /> {{currentPlayer.buttonsInPocket}}</span></h2>
+            <quilt-board :tile="tile" :player="currentPlayer" />
+            <div v-if="tile" class="quiltBoardToolbar">
+              <tile-mini :tile-data="tile" />
+              <template v-if="$store.state.miniTile">
+                Place this tile to continue.
+              </template>
+              <template v-else>
+                <button @click="mirrorTile"><i class="fal fa-sync" /> Mirror Tile</button>
+                <button @click="rotateTile"><i class="fal fa-sync" /> Rotate Tile</button>
+              </template>
+            </div>
+            <div v-else class="quiltBoardToolbar">
+              <center>
+                Select a tile or go forward.
+              </center>
+            </div>
+          </div>
+
+          <div v-if="otherPlayer.index === player.index" :key="player.index" :class="[`player${player.index}`]" class="boardContainer">
+            <h2>{{otherPlayer.name}} <span><i class="fal fa-bullseye" /> {{otherPlayer.buttonsInPocket}}</span></h2>
+            <quilt-board-mini :player="otherPlayer" />
+          </div>
+        </template>
+
+        <div class="boardContainer">
+          <play-board />
+          <button v-if="!miniTile" @click="goForward"><i class="fal fa-arrow-right" /> Go forward</button>
+        </div>
+      </div>
+
+      <tile-list />
+
+    </div>
 
     <div v-if="!currentlyPlaying && !isGameOver" class="waiting overlay">
       <h1>Waiting for other player</h1>
@@ -92,6 +126,7 @@
       </ul>
       <button @click="storedGamesList=undefined">Close list</button>
     </div>
+
   </div>
 </template>
 
@@ -217,6 +252,9 @@ export default {
     }
   },
   methods: {
+    clearSelectedTile () {
+      this.$store.commit('resetTiles')
+    },
     mirrorTile () {
       this.$store.commit('mirrorTile')
     },
@@ -309,6 +347,12 @@ body {
   min-height: 100vh;
   justify-content: center;
   align-items: center;
+  position: relative;
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: @cText;
 }
 h2,h3 {
   margin: 0;
@@ -335,13 +379,7 @@ button {
     margin-right: .3em;
   }
 }
-#app {
-  position: relative;
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: @cText;
+.gamearea.desktop {
   width: 95%;
   min-width: 800px;
   max-width: 1024px;
@@ -493,5 +531,19 @@ button {
   border-radius: 2px;
   margin: 5px 0 0 0;
   cursor: pointer;
+}
+
+.gamearea.mobile {
+  width: 100vw;
+  margin-bottom: @mTileCellsSize * 7 + 95px;
+  .mobileToolbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding-top: 5px;
+    height: @mTileCellsSize * 7 + 95px;
+    background: lighten(@cBackground, 55%);
+  }
 }
 </style>

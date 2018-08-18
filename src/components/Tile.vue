@@ -1,5 +1,5 @@
 <template>
-  <div class="tile">
+  <div :class="{mobile: $root.isMobile}" class="tile">
     <div v-for="(row,i) in tileData.pattern" :key="`r${tileData.id}${i}`" class="row">
       <div v-for="(cell,j) in row" :key="`c${tileData.id}${i}${j}`" :class="{filled: cell, button: cell === 2}" class="cell" />
     </div>
@@ -38,6 +38,18 @@ export default {
     }
     &.button {
       .tileButton;
+    }
+  }
+  &.mobile {
+    .row {
+      height: @mTileCellsSize;
+    }
+    .cell {
+      width: @mTileCellsSize;
+      height: @mTileCellsSize;
+      &.button {
+        .mobileButton;
+      }
     }
   }
 }

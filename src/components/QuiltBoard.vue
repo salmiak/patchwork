@@ -1,7 +1,12 @@
 <template>
-  <div :class="{hit: hit}" class="board" @mouseout="resetAllCells()">
+  <div :class="{hit: hit, mobile: $root.isMobile}" class="board" @mouseout="resetAllCells()">
     <div v-for="(row,rIndex) in player.board" v-bind:key="`row-${rIndex}`" class="row">
-      <div v-for="(cell) in row" v-bind:key="`cell-${cell.id}`" :class="{filled:cell.value, hovered:cell.hovered, recent:cell.lastMove, button:cell.value === 2}" class="cell"  @mouseover="mouseOver(cell)" @click="storeTile" @contextmenu.prevent="rotateTile()">&nbsp;</div>
+      <template v-if="$root.isMobile">
+        <div v-for="(cell) in row" v-bind:key="`cell-${cell.id}`"  :class="{filled:cell.value, hovered:cell.hovered, recent:cell.lastMove, button:cell.value === 2}" class="cell" @touchstart.prevent="touchStart($event, cell)" @touchmove.prevent="touchMove($event, cell)">&nbsp;</div>
+      </template>
+      <template v-else>
+        <div v-for="(cell) in row" v-bind:key="`cell-${cell.id}`"  :class="{filled:cell.value, hovered:cell.hovered, recent:cell.lastMove, button:cell.value === 2}" class="cell" @mouseover="mouseOver(cell)" @click="storeTile" @contextmenu.prevent="rotateTile()">&nbsp;</div>
+      </template>
     </div>
   </div>
 </template>
@@ -14,10 +19,23 @@ export default {
     return {
       boardSize: 9,
       hit: false,
-      cursor: {}
+      cursor: {},
+      touchStartPos: {}
     }
   },
   methods: {
+    touchStart (evt, cell) {
+      this.touchStartPos = {
+        x: evt.changedTouches[0].pageX,
+        y: evt.changedTouches[0].pageY
+      }
+      this.mouseOver(cell)
+    },
+    touchMove (evt, cell) {
+      var dX = Math.floor((evt.changedTouches[0].pageX - this.touchStartPos.x)/25.59)
+      var dY = Math.floor((evt.changedTouches[0].pageY - this.touchStartPos.y)/25.59)
+      this.mouseOver(this.getCellAt(cell.x+dX, cell.y+dY))
+    },
     getCellAt (x,y) {
       return this.$store.getters.getCellAt({x:x, y:y, pnr: this.player.index})
     },
@@ -111,6 +129,20 @@ export default {
     }
     &.button {
       .tileButton;
+    }
+  }
+
+  &.mobile {
+    @mSize: @size * 0.8;
+    width: @quiltBoardCells * @mSize;
+    height: @quiltBoardCells * @mSize;
+    .row { height: @mSize; }
+    .cell {
+      height: @mSize;
+      width: @mSize;
+      &.button {
+        .mobileButton;
+      }
     }
   }
 }

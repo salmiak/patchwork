@@ -15,6 +15,7 @@
     "less": "^3.7.1",
     "less-loader": "^4.1.0",
     "lodash": "^4.17.10",
+    "mobile-detect": "^1.4.2",
     "randomstring": "^1.1.5",
     "socket.io": "^2.1.1",
     "vue": "^2.5.16",
@@ -23,6 +24,7 @@
     "vue-cookies": "^1.5.6",
     "vue-router": "^3.0.1",
     "vue-socket.io": "^2.1.1-b",
+    "vue2-touch-events": "^1.0.0",
     "vuex": "^3.0.1"
   },
   "devDependencies": {

@@ -1,5 +1,5 @@
 <template lang="html">
-  <ul class="tileList">
+  <ul :class="{mobile: $root.isMobile}" class="tileList">
     <li v-for="(tile, i) in tileArray" :key="tile.id">
       <div class="tileInfo">
         <i class="fal fa-hourglass-half" /> {{tile.time}} | <i class="fal fa-bullseye" /> {{tile.cost}}
@@ -44,6 +44,14 @@ export default {
   overflow-y: visible;
   min-height: @quiltBoardCellsSize * 7;
   border-radius: 0 0 6px 6px;
+  &.mobile {
+    min-height: @mTileCellsSize * 7;
+    margin-bottom: 5px;
+    border-radius: 0;
+    li {
+      width: 25%;
+    }
+  }
   li {
     padding: 10px;
     display: block;

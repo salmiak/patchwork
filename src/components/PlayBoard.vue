@@ -1,5 +1,5 @@
 <template lang="html">
-  <div id="playBoard">
+  <div id="playBoard" :class="{mobile: $root.isMobile}">
     <div v-for="(secCells, index) in sections" :key="`sec-${index}`" :class="[`section-${index}`]" class="section">
       <div v-for="cell in secCells" :key="cell.index" :class="[`cell-${cell.index}`, {even: cell.index % 2, tripple: cell.size === 3, big: cell.big, button: cell.button}]" class="cell">
 
@@ -58,19 +58,14 @@ export default {
 <style lang="less" scoped>
 @import '../assets/base.less';
 @size: @playBoardCellSize;
+@mSize: 20px;
 @cells: 8;
 @buttonSize: @playBoardCellSize * 0.8;
 @border: 1px solid @cBorder;
 @color1: lighten(@cBackground, 25%);
 @color2: lighten(@cBackground, 10%);
-#playBoard {
-  width: @cells * @size;
-  height: @cells * @size;
-  position: relative;
-  box-sizing: content-box;
-  margin: 20px auto;
-}
-.section {
+
+.section(@size) {
   display: flex;
   position: absolute;
   box-sizing: border-box;
@@ -251,6 +246,45 @@ export default {
       height: @size*2;
       border: @border;
       border-bottom: none;
+    }
+  }
+}
+
+#playBoard {
+  width: @cells * @size;
+  height: @cells * @size;
+  position: relative;
+  box-sizing: content-box;
+  margin: 20px auto;
+  .section {
+    .section(@size);
+  }
+  &.mobile {
+    margin: 10px auto;
+    width: @cells * @size * 0.5;
+    height: @cells * @size * 0.5;
+    .section {
+      .section(@size * 0.5);
+      .cell {
+        .patch {
+          display: block;
+          width: @quiltBoardCellsSize * 0.5;
+          height: @quiltBoardCellsSize * 0.5;
+          top: (@size * 0.5 - 1 - @quiltBoardCellsSize * 0.5)/2;
+        }
+        .button {
+          @mbSize: @buttonSize * 0.5;
+          width: @mbSize;
+          height: @mbSize;
+          border-radius: @mbSize;
+          border: 3px solid @cYellow;
+          top: (@size * 0.5 - @mbSize)/2;
+          right: @mbSize/-2;
+          &::before {
+            display: none;
+          }
+        }
+      }
     }
   }
 }

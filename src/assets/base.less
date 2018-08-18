@@ -14,6 +14,7 @@
 
 @quiltBoardCells: 9;
 @quiltBoardCellsSize: 32px;
+@mTileCellsSize: 12px;
 @playBoardCellSize: @quiltBoardCellsSize * 9/8;
 @miniCellSize: @quiltBoardCellsSize * 0.25;
 @buttonSize: @quiltBoardCellsSize * 0.75;
@@ -51,6 +52,21 @@
     transform: translate(-1*@holeSize,-1*@holeSize);
     z-index: 150;
     box-sizing: border-box;
+  }
+}
+.mobileButton {
+  @size: @quiltBoardCellsSize * 0.5;
+  @mButtonSize: 84%;
+  &::after {
+    width: @mButtonSize;
+    height: @mButtonSize;
+    border-radius: @mButtonSize;
+    border: 2px solid @cYellow;
+    top: 8%;
+    left: 8%;
+  }
+  &::before {
+    display: none;
   }
 }
 
