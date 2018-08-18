@@ -85,7 +85,7 @@ app.get('/games/delete/:id', (req, res) => {
     delete games[req.params.id]
     res.send('Deleted')
   } else {
-    res.send('Game not found')
+    res.send('Game not found!')
   }
 })
 
