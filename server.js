@@ -1,3 +1,4 @@
+var _ = require('lodash')
 var app = require('express')()
 var http = require('http').Server(app)
 var io = require('socket.io')(http)
@@ -70,6 +71,23 @@ io.on('connection', function (socket) {
   });
 
 });
+
+app.get('/games', (req, res) => {
+  res.send( _.keys(games) )
+})
+
+app.get('/games/:id', (req, res) => {
+  res.send( games[req.params.id] )
+})
+
+app.get('/games/delete/:id', (req, res) => {
+  if (games[req.params.id]) {
+    delete games[req.params.id]
+    res.send('Deleted')
+  } else {
+    res.send('Game not found')
+  }
+})
 
 http.listen(port);
 console.log('server started '+ port);
