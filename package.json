@@ -17,7 +17,7 @@
     "lodash": "^4.17.10",
     "mobile-detect": "^1.4.2",
     "randomstring": "^1.1.5",
-    "socket.io": "^2.1.1",
+    "socket.io": "^2.4.0",
     "vue": "^2.5.16",
     "vue-clipboard2": "^0.2.1",
     "vue-cookie": "^1.1.4",
